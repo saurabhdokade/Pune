@@ -1,35 +1,74 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import Login from './pages/Login';
+import { AuthProvider } from './components/AuthContext';
+import Signup from './pages/signup';
 
-function App() {
-  const [count, setCount] = useState(0)
+
+function AppContent() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+
+  // Hide sidebar and navbar on login and signup pages
+  const hideSidebarAndNavbar = location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/sellerregister' || location.pathname === '/addstore' || location.pathname === '/register' || location.pathname === '/';
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="flex min-h-screen">
+      {/* Desktop Sidebar */}
+      {!hideSidebarAndNavbar && (
+        <div className={`hidden md:flex fixed top-0 left-0 h-full w-64 bg-[#2F5383] text-white z-50`}>
+          <Sidebar isOpen={sidebarOpen} toggleSidebar={setSidebarOpen} />
+        </div>
+      )}
+
+      {/* Mobile Sidebar Overlay & Sidebar */}
+      {!hideSidebarAndNavbar && (
+        <div className="md:hidden">
+          <div
+            className={`fixed inset-0 z-40 bg-black bg-opacity-50 transition-opacity duration-300 ${
+              sidebarOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+            }`}
+            onClick={() => setSidebarOpen(false)}
+          />
+          <div
+            className={`fixed top-0 left-0 h-full w-64 bg-[#2F5383] text-white z-50 overflow-hidden
+              transform transition-transform duration-300 ${
+                sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+              }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Sidebar isOpen={sidebarOpen} toggleSidebar={setSidebarOpen} />
+          </div>
+        </div>
+      )}
+
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col">
+        {!hideSidebarAndNavbar && (
+          <Navbar toggleSidebar={() => setSidebarOpen((prev) => !prev)} />
+        )}
+        <div className="flex-1 p-4 overflow-y-auto">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+                        <Route path="/signup" element={<Signup />} />
+
+          </Routes>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </AuthProvider>
+  );
+}
+
+//
+
+export default App;
