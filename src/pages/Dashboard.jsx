@@ -1,5 +1,4 @@
-import React from "react";
-import Navbar from "../components/Navbar";
+import React from 'react';
 import {
     BarChart,
     Bar,
@@ -15,8 +14,8 @@ import {
     Pie,
     Cell
 } from "recharts";
-import { Star, Bell, Search, UserCircle } from "lucide-react";
-import pendingIcon from '../assets/1be661da7ec47814f43f5782f152a0db7d07ce14.png'; // Replace with actual path
+import { Star } from "lucide-react";
+import pendingIcon from '../assets/1be661da7ec47814f43f5782f152a0db7d07ce14.png';
 import userIcon from '../assets/b11069a4de6e255d90b4a00989a3ea8f73271f4c.png';
 
 const pieData = [
@@ -43,18 +42,15 @@ const reviews = [
 
 export default function Dashboard() {
     return (
-        <div className="min-h-screen bg-gray-100 p-4 font-sans">
-            <div className="fixed top-0 left-0 right-0 z-30 md:ml-64">
-            </div>
-          
+        <div className="min-h-screen bg-gray-100 p-2 sm:p-4 font-sans md:ml-64">
             {/* Welcome Message */}
-            <div className="bg-indigo-600 text-white p-6 rounded-xl mt-4">
-                <h2 className="text-2xl font-semibold">Hello! John Doe</h2>
-                <p>We are on a mission to help customer</p>
+            <div className="bg-indigo-600 text-white p-4 sm:p-6 rounded-xl mt-4">
+                <h2 className="text-xl sm:text-2xl font-semibold">Hello! John Doe</h2>
+                <p className="text-sm sm:text-base">We are on a mission to help customer</p>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mt-4">
                 <StatCard title="Total Customer" value="30,0000" icon="👥" />
                 <StatCard title="Total Order" value="3200" icon="🛍️" />
                 <StatCard title="Total Branch" value="32450" icon="💰" />
@@ -62,25 +58,21 @@ export default function Dashboard() {
             </div>
 
             {/* Main Content */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-               
-
-                <div className="bg-white rounded-xl shadow-md p-4">
-                    {/* Pie Chart Card */}
-                    <div className="bg-white rounded-xl shadow-md p-4 relative">
-                        <h4 className="font-semibold text-lg mb-1">Order Status</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4 mt-4">
+                {/* Pie Chart Card */}
+                <div className="bg-white rounded-xl shadow-md p-2 sm:p-4">
+                    <div className="bg-white rounded-xl shadow-md p-2 sm:p-4 relative">
+                        <h4 className="font-semibold text-base sm:text-lg mb-1">Order Status</h4>
                         <p className="text-xs text-gray-400 mb-2">Total Earnings of the Month</p>
-
-                        {/* Pie Chart */}
-                        <div className="relative h-[200px]">
+                        <div className="relative h-[180px] sm:h-[200px]">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
                                         data={pieData}
                                         cx="50%"
                                         cy="50%"
-                                        innerRadius={40}
-                                        outerRadius={60}
+                                        innerRadius={30}
+                                        outerRadius={50}
                                         dataKey="value"
                                     >
                                         {pieData.map((entry, index) => (
@@ -89,41 +81,34 @@ export default function Dashboard() {
                                     </Pie>
                                 </PieChart>
                             </ResponsiveContainer>
-
                             {/* Center Text */}
                             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                                <p className="text-sm font-medium text-gray-700">Ratio</p>
-                                <p className="text-lg font-semibold">100%</p>
+                                <p className="text-xs sm:text-sm font-medium text-gray-700">Ratio</p>
+                                <p className="text-base sm:text-lg font-semibold">100%</p>
                             </div>
                         </div>
-
                         {/* Custom Legend */}
                         <div className="flex flex-col mt-3 space-y-1">
                             <div className="flex items-center gap-2">
-                                <span className="h-3 w-3 rounded-full bg-[#00C49F]" />
-                                <span className="text-sm text-gray-600">Success Order</span>
+                                <span className="h-3 w-3 rounded-full bg-[#2ecc71]" />
+                                <span className="text-xs sm:text-sm text-gray-600">Success Order</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <span className="h-3 w-3 rounded-full bg-[#FFBB28]" />
-                                <span className="text-sm text-gray-600">Pending Order</span>
+                                <span className="h-3 w-3 rounded-full bg-[#f1c40f]" />
+                                <span className="text-xs sm:text-sm text-gray-600">Pending Order</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <span className="h-3 w-3 rounded-full bg-[#FF4C4C]" />
-                                <span className="text-sm text-gray-600">Failed Order</span>
+                                <span className="h-3 w-3 rounded-full bg-[#e74c3c]" />
+                                <span className="text-xs sm:text-sm text-gray-600">Failed Order</span>
                             </div>
                         </div>
                     </div>
-
-
-
-
                 </div>
 
-
                 {/* Line Charts */}
-                <div className="bg-white rounded-xl shadow-md p-4">
-                    <h4 className="font-semibold mb-2">Customer Overview</h4>
-                    <ResponsiveContainer width="100%" height={200}>
+                <div className="bg-white rounded-xl shadow-md p-2 sm:p-4">
+                    <h4 className="font-semibold mb-2 text-base sm:text-lg">Customer Overview</h4>
+                    <ResponsiveContainer width="100%" height={180}>
                         <LineChart data={lineData}>
                             <Line type="monotone" dataKey="customers" stroke="#8884d8" />
                             <XAxis dataKey="name" />
@@ -133,9 +118,9 @@ export default function Dashboard() {
                     </ResponsiveContainer>
                 </div>
 
-                <div className="bg-white rounded-xl shadow-md p-4">
-                    <h4 className="font-semibold mb-2">Order Overview</h4>
-                    <ResponsiveContainer width="100%" height={200}>
+                <div className="bg-white rounded-xl shadow-md p-2 sm:p-4">
+                    <h4 className="font-semibold mb-2 text-base sm:text-lg">Order Overview</h4>
+                    <ResponsiveContainer width="100%" height={180}>
                         <LineChart data={lineData}>
                             <Line type="monotone" dataKey="orders" stroke="#82ca9d" />
                             <XAxis dataKey="name" />
@@ -147,11 +132,11 @@ export default function Dashboard() {
             </div>
 
             {/* Second Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4 mt-4">
                 {/* Delivery Boy Overview */}
-                <div className="bg-white rounded-xl shadow-md p-4">
-                    <h4 className="font-semibold mb-2">Delivery Boy Overview</h4>
-                    <ResponsiveContainer width="100%" height={200}>
+                <div className="bg-white rounded-xl shadow-md p-2 sm:p-4">
+                    <h4 className="font-semibold mb-2 text-base sm:text-lg">Delivery Boy Overview</h4>
+                    <ResponsiveContainer width="100%" height={180}>
                         <LineChart data={lineData}>
                             <Line type="monotone" dataKey="delivery" stroke="#2ecc71" />
                             <XAxis dataKey="name" />
@@ -162,21 +147,21 @@ export default function Dashboard() {
                 </div>
 
                 {/* Reviews */}
-                <div className="bg-white rounded-xl shadow-md p-4">
-                    <h4 className="font-semibold mb-2">Reviews</h4>
+                <div className="bg-white rounded-xl shadow-md p-2 sm:p-4">
+                    <h4 className="font-semibold mb-2 text-base sm:text-lg">Reviews</h4>
                     <div className="flex items-center gap-2 text-yellow-500">
                         {[...Array(5)].map((_, i) => (
                             <Star key={i} fill="#facc15" />
                         ))}
-                        <span className="ml-2 font-medium text-black">4.0 out of 5 star</span>
+                        <span className="ml-2 font-medium text-black text-xs sm:text-base">4.0 out of 5 star</span>
                     </div>
                     <div className="mt-4 space-y-2">
                         {reviews.map((r, i) => (
                             <div key={i} className="flex items-center gap-2">
-                                <span className="w-20 text-sm">{r.label}</span>
+                                <span className="w-16 sm:w-20 text-xs sm:text-sm">{r.label}</span>
                                 <div className="w-full bg-gray-200 rounded-full">
                                     <div
-                                        className={`${r.color} h-3 rounded-full`}
+                                        className={`${r.color} h-2 sm:h-3 rounded-full`}
                                         style={{ width: `${r.value}%` }}
                                     ></div>
                                 </div>
@@ -186,33 +171,31 @@ export default function Dashboard() {
                 </div>
 
                 {/* Feeds */}
-                <div className="bg-white rounded-xl shadow-md p-4">
-                    <h4 className="text-lg font-bold mb-4">Feeds</h4>
-
+                <div className="bg-white rounded-xl shadow-md p-2 sm:p-4">
+                    <h4 className="text-base sm:text-lg font-bold mb-4">Feeds</h4>
                     <div className="flex items-center space-x-3 mb-4">
                         <img
                             src={pendingIcon}
                             alt="Pending Orders"
-                            className="w-12 h-12 rounded-full bg-blue-100 p-2"
+                            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-100 p-2"
                         />
-                        <p className="text-base font-medium">You Have 4 pending orders</p>
+                        <p className="text-xs sm:text-base font-medium">You Have 4 pending orders</p>
                     </div>
-
                     <div className="flex items-center space-x-3">
                         <img
                             src={userIcon}
                             alt="New User"
-                            className="w-12 h-12 rounded-full bg-orange-100 p-2"
+                            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-orange-100 p-2"
                         />
-                        <p className="text-base font-medium">New user registered</p>
+                        <p className="text-xs sm:text-base font-medium">New user registered</p>
                     </div>
                 </div>
             </div>
 
             {/* Visitor Performance */}
-            <div className="bg-white rounded-xl shadow-md p-4 mt-4">
-                <h4 className="font-semibold mb-2">Visitor Performance</h4>
-                <ResponsiveContainer width="100%" height={200}>
+            <div className="bg-white rounded-xl shadow-md p-2 sm:p-4 mt-4">
+                <h4 className="font-semibold mb-2 text-base sm:text-lg">Visitor Performance</h4>
+                <ResponsiveContainer width="100%" height={180}>
                     <LineChart data={lineData}>
                         <Line type="monotone" dataKey="customers" stroke="#3b82f6" />
                         <Line type="monotone" dataKey="orders" stroke="#ef4444" />
@@ -229,10 +212,10 @@ export default function Dashboard() {
 
 function StatCard({ title, value, icon }) {
     return (
-        <div className="bg-white rounded-xl shadow-md p-4 flex flex-col items-center justify-center">
-            <div className="text-4xl">{icon}</div>
-            <h4 className="mt-2 text-lg font-semibold">{title}</h4>
-            <p className="text-xl font-bold">{value}</p>
+        <div className="bg-white rounded-xl shadow-md p-2 sm:p-4 flex flex-col items-center justify-center">
+            <div className="text-2xl sm:text-4xl">{icon}</div>
+            <h4 className="mt-2 text-base sm:text-lg font-semibold text-center">{title}</h4>
+            <p className="text-lg sm:text-xl font-bold">{value}</p>
         </div>
     );
 }

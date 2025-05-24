@@ -1,53 +1,32 @@
-
 import React from 'react';
-import { FaSearch, FaBell, FaUserCircle, FaBars } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom'; // Add this import
+import { FaBell, FaMoon } from 'react-icons/fa';
 
-const Navbar = ({ screenName, toggleSidebar }) => {
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const navigate = useNavigate(); // Initialize navigate
-
+const Navbar = () => {
   return (
     <div
-      className="flex items-center justify-between p-4 shadow-md"
+      className="flex items-center justify-end p-4 shadow-md fixed top-0 right-0 z-50 w-full md:left-64 md:w-[calc(100%-256px)]"
       style={{
-        backgroundColor: '#2F5383',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 1000,
+        backgroundColor: '#fff',
+        borderBottom: '3px solid #6C63FF',
       }}
     >
-      {/* Left: Hamburger on mobile */}
       <div className="flex items-center space-x-4">
-        <div className="md:hidden">
-<FaBars className="text-white text-2xl cursor-pointer" onClick={toggleSidebar} /></div>
-        <h1 className="text-white text-2xl font-semibold hidden md:block">{screenName}</h1>
-      </div>
-
-      {/* Right: Search, Notifications, Profile */}
-      <div className="flex items-center space-x-4">
-        {/* Search Bar */}
-        <div className="relative flex items-center">
-          <FaSearch className="text-white text-xl absolute left-2 pointer-events-none" />
-          <input
-            type="text"
-            className="bg-transparent text-white border-b border-white px-10 py-1 focus:outline-none w-48 md:w-72"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search..."
-          />
+        {/* Notification Icon */}
+        <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100">
+          <FaBell className="text-gray-700 text-lg" />
         </div>
-
-        {/* Notification */}
-        <FaBell className="text-white text-xl cursor-pointer" />
-
-        {/* Profile */}
-        <FaUserCircle
-          className="text-white text-2xl cursor-pointer"
-          onClick={() => navigate('/adminprofile')} // Navigate to adminprofile
+        {/* Dark Mode Icon */}
+        <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100">
+          <FaMoon className="text-gray-700 text-lg" />
+        </div>
+        {/* Profile Image */}
+        <img
+          src="https://randomuser.me/api/portraits/men/32.jpg"
+          alt="Profile"
+          className="w-10 h-10 rounded-full object-cover"
         />
+        {/* User Name */}
+        <span className="text-gray-500 font-medium">John Doe</span>
       </div>
     </div>
   );
