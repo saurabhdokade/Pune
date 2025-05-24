@@ -42,7 +42,7 @@ const Sidebar = () => {
         </div>
 
         {/* Navigation Menu */}
-        <ul className="p-4 space-y-3 text-sm text-purple-600">
+        <ul className=" p-4 space-y-3 text-sm text-purple-600">
           {/* Active Item: Dashboard */}
           <li className="flex items-center space-x-2 font-bold bg-purple-100 px-3 py-2 rounded-md text-purple-700">
             <FaTachometerAlt />
