@@ -16,8 +16,10 @@ import {
     Cell
 } from "recharts";
 import { Star, Bell, Search, UserCircle } from "lucide-react";
-import pendingIcon from '../assets/1be661da7ec47814f43f5782f152a0db7d07ce14.png'; // Replace with actual path
-import userIcon from '../assets/b11069a4de6e255d90b4a00989a3ea8f73271f4c.png';
+import pendingIcon from '../assets/b11069a4de6e255d90b4a00989a3ea8f73271f4c.png'; // Replace with actual path
+import userIcon from '../assets/1be661da7ec47814f43f5782f152a0db7d07ce14.png';
+// Calculate max value dynamically
+// const maxReviewValue = Math.max(...reviews.map(r => r.value));
 
 const pieData = [
     { name: "Success Order", value: 60, color: "#2ecc71" },
@@ -40,13 +42,14 @@ const reviews = [
     { label: "Avg-below", value: 20, color: "bg-orange-400" },
     { label: "Poor", value: 10, color: "bg-red-500" },
 ];
+const maxReviewValue = Math.max(...reviews.map(r => r.value));
 
 export default function Dashboard() {
     return (
         <div className="min-h-screen bg-gray-100 p-4 font-sans">
             <div className="fixed top-0 left-0 right-0 z-30 md:ml-64">
             </div>
-          
+
             {/* Welcome Message */}
             <div className="bg-indigo-600 text-white p-6 rounded-xl mt-4">
                 <h2 className="text-2xl font-semibold">Hello! John Doe</h2>
@@ -63,7 +66,7 @@ export default function Dashboard() {
 
             {/* Main Content */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-               
+
 
                 <div className="bg-white rounded-xl shadow-md p-4">
                     {/* Pie Chart Card */}
@@ -162,7 +165,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Reviews */}
-                <div className="bg-white rounded-xl shadow-md p-4">
+                {/* <div className="bg-white rounded-xl shadow-md p-4">
                     <h4 className="font-semibold mb-2">Reviews</h4>
                     <div className="flex items-center gap-2 text-yellow-500">
                         {[...Array(5)].map((_, i) => (
@@ -183,7 +186,34 @@ export default function Dashboard() {
                             </div>
                         ))}
                     </div>
+                </div> */}
+
+                <div className="bg-white rounded-xl shadow-md p-4">
+                    <h4 className="font-semibold mb-2">Reviews</h4>
+                    <div className="flex items-center gap-2 text-yellow-500">
+                        {[...Array(5)].map((_, i) => (
+                            <Star key={i} fill="#facc15" />
+                        ))}
+                        <span className="ml-2 font-medium text-black">4.0 out of 5 star</span>
+                    </div>
+
+                    <div className="mt-4 space-y-2">
+                        {reviews.map((r, i) => (
+                            <div key={i} className="flex items-center gap-2">
+                                <span className="w-20 text-sm">{r.label}</span>
+                                <div className="w-full bg-gray-200 rounded-full">
+                                    <div
+                                        className={`${r.color} h-3 rounded-full`}
+                                        style={{
+                                            width: `${(r.value / maxReviewValue) * 100}%`,
+                                        }}
+                                    ></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
+
 
                 {/* Feeds */}
                 <div className="bg-white rounded-xl shadow-md p-4">
