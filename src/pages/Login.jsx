@@ -154,7 +154,7 @@ export default function Login() {
               className="bg-[#F6F6F6] rounded-2xl flex items-center justify-center w-[440px] h-[540px] relative"
               draggable={false}
             />
-            {/* Carousel dots (static for now) */}
+            {/* Carousel dots (static for now s) */}
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
               <span className="h-[6px] w-[18px] rounded-lg bg-[#757CFF]" />
               <span className="h-[6px] w-[6px] rounded-full bg-[#D1D5DB]" />
