@@ -1,70 +1,30 @@
-.login-container {
+.signup-container {
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 2rem;
-<<<<<<< HEAD
-}
-
-.login-grid {
-  display: flex;
-  flex-direction: row;
-  background: white;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  max-width: 1100px;
-  width: 100%;
-}
-
-.image-container {
-  flex: 1;
-  min-width: 350px;
-  background-color: #f0f4ff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.login-image {
-  width: 747px;
-  height: 800px;
-  object-fit: cover;
-  max-width: 100%;
-  max-height: 100%;
-}
-
-.login-box {
-  flex: 1;
-  padding: 3rem 2rem;
-=======
   background-color: #f9fafb;
 }
 
-.login-grid {
+.signup-grid {
   width: 100%;
   max-width: 480px;
   background: white;
   border-radius: 10px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   padding: 2.5rem 2rem;
->>>>>>> b2633799da156edda9d9a7d988d5c4ffdd21dfb4
 }
 
-.login-title {
+.signup-title {
   font-size: 2rem;
   font-weight: 600;
   color: #4c51bf;
   text-align: center;
-<<<<<<< HEAD
-  margin-bottom: 1.5rem;
-=======
   margin-bottom: 2rem;
->>>>>>> b2633799da156edda9d9a7d988d5c4ffdd21dfb4
 }
 
-.login-form {
+.signup-form {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -85,13 +45,8 @@
   padding: 0.75rem;
   border: 1px solid #cbd5e0;
   border-radius: 0.375rem;
-<<<<<<< HEAD
-  outline: none;
-  font-size: 1rem;
-=======
   font-size: 1rem;
   outline: none;
->>>>>>> b2633799da156edda9d9a7d988d5c4ffdd21dfb4
   transition: border-color 0.3s;
 }
 
@@ -113,14 +68,11 @@
   background-color: #434190;
 }
 
-.signup-link {
+.login-link {
   text-align: center;
   font-size: 0.875rem;
   margin-top: 1rem;
-<<<<<<< HEAD
-=======
   color: #4a5568;
->>>>>>> b2633799da156edda9d9a7d988d5c4ffdd21dfb4
 }
 
 .link-text {
@@ -133,21 +85,3 @@
 .link-text:hover {
   color: #434190;
 }
-<<<<<<< HEAD
-
-/* Responsive */
-@media (max-width: 768px) {
-  .login-grid {
-    flex-direction: column;
-  }
-
-  .login-image {
-    height: auto;
-  }
-
-  .image-container {
-    display: none;
-  }
-}
-=======
->>>>>>> b2633799da156edda9d9a7d988d5c4ffdd21dfb4
