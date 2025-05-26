@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash, FaFacebookF, FaGoogle, FaApple } from "react-icons/fa";
 import signupImg from "../assets/5774b1d8a66bd464021e86eb52c3b8dc230da000.png"; // Update to your image path
-
+import Logo from "../components/Logo";
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [showCPassword, setShowCPassword] = useState(false);
@@ -44,9 +44,9 @@ export default function Signup() {
             <img
               src={signupImg}
               alt="Signup Illustration"
-              className="w-[320px] object-contain"
+              className="bg-[#F6F6F6] rounded-2xl flex items-center justify-center w-[440px] h-[640px] relative"
               draggable={false}
-              style={{marginTop: 0, marginBottom: 0}}
+              style={{ marginTop: 0, marginBottom: 0 }}
             />
             {/* Carousel dots */}
             <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
@@ -59,15 +59,8 @@ export default function Signup() {
         {/* RIGHT: Form */}
         <div className="flex-1 flex flex-col justify-center w-full md:w-1/2 px-2">
           {/* Logo top right on desktop */}
-          <div className="flex items-center justify-end mb-3">
-            <svg width={38} height={38} fill="none" viewBox="0 0 40 40">
-              <circle cx="20" cy="20" r="20" fill="#E6EDFF"/>
-              <g>
-                <circle cx="20" cy="17" r="7" stroke="#264283" strokeWidth="2"/>
-                <rect x="19" y="13" width="2" height="5" rx="1" fill="#264283"/>
-                <rect x="17" y="18" width="6" height="2" rx="1" fill="#264283"/>
-              </g>
-            </svg>
+          <div className="flex items-center mb-10">
+            <Logo size={38} />
             <span className="ml-3 font-bold text-xl text-[#264283] leading-tight flex flex-col">
               <span>CITY CENTER</span>
               <span>MALL</span>

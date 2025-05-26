@@ -52,7 +52,7 @@ export default function Dashboard() {
             {/* Header */}
             <div className="fixed top-0 left-0 right-0 z-30 md:ml-64"></div>
             {/* Welcome Message */}
-            <div className="bg-[#6C63FF] text-white p-6 rounded-xl mt-14 flex flex-col gap-1">
+            <div className="bg-[#2F5383] text-white p-6 rounded-xl mt-14 flex flex-col gap-1">
                 <h2 className="text-2xl font-semibold tracking-tight">Hello! John Doe</h2>
                 <p className="text-base font-normal">We are on a mission to help customer</p>
             </div>
