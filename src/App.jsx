@@ -74,7 +74,7 @@ function AppContent() {
         {!hideSidebarAndNavbar && (
           <Navbar toggleSidebar={() => setSidebarOpen(prev => !prev)} />
         )}
-        <div className="flex-1 p-1 overflow-y-auto bg-gray-100 min-h-screen">
+        <div className="flex-1 p-1 overflow-y-auto bg-[#2F5383] min-h-screen">
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />

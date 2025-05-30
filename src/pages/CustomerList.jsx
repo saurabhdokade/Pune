@@ -76,7 +76,7 @@ const CustomerList = () => {
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full border border-gray-200 rounded-md py-2 pl-10 pr-4 focus:outline-none focus:ring-1 focus:ring-pink-400 bg-white text-sm"
+                            className="w-full border border-gray-200 rounded-md py-2 pl-10 pr-4 focus:outline-none focus:ring-1 focus:ring-[#EB627D] bg-white text-sm"
                             placeholder="Search here..."
                         />
                         <svg
@@ -96,11 +96,11 @@ const CustomerList = () => {
                     <label className="block text-gray-700 font-medium mb-2">
                         Select Branch
                     </label>
-                    <div className="relative w-full md:w-80">
+                    <div className="relative w-full md:w-288">
                         <select
                             value={branch}
                             onChange={(e) => setBranch(e.target.value)}
-                            className="w-full border border-gray-200 rounded-md py-2 px-4 text-gray-700 focus:outline-none focus:ring-1 focus:ring-pink-400 bg-white"
+                            className="w-full border border-gray-200 rounded-md py-2 px-4 text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#EB627D] bg-white"
                         >
                             {branches.map((b) => (
                                 <option value={b.value} key={b.value}>
@@ -108,7 +108,7 @@ const CustomerList = () => {
                                 </option>
                             ))}
                         </select>
-                        <svg
+                        {/* <svg
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none"
                             fill="none"
                             stroke="currentColor"
@@ -116,16 +116,16 @@ const CustomerList = () => {
                             viewBox="0 0 24 24"
                         >
                             <path d="M19 9l-7 7-7-7" />
-                        </svg>
+                        </svg> */}
                     </div>
                 </div>
                 {/* Responsive Table */}
-                <div className="rounded-xl shadow bg-white overflow-x-auto">
+                <div className="rounded-xll shadow bg-white overflow-x-auto">
                     {/* Table for md+ */}
                     <table className="min-w-full text-sm text-gray-800 hidden md:table">
                         <thead>
-                            <tr className="bg-pink-400 text-white">
-                                <th className="font-semibold py-3 px-4 rounded-tl-xl">Sr. No.</th>
+                            <tr className="bg-[#EB627D] text-white">
+                                <th className="font-semibold py-3 px-4 rounded-tl-xll">Sr. No.</th>
                                 <th className="font-semibold py-3 px-4 cursor-pointer select-none flex items-center gap-2">
                                     <span>Full Name</span>
                                     <button
@@ -138,7 +138,7 @@ const CustomerList = () => {
                                 </th>
                                 <th className="font-semibold py-3 px-4">Phone Number</th>
                                 <th className="font-semibold py-3 px-4">Full Address</th>
-                                <th className="font-semibold py-3 px-4 rounded-tr-xl">Action</th>
+                                <th className="font-semibold py-3 px-4 rounded-tr-xll text-left">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -158,10 +158,10 @@ const CustomerList = () => {
                                         />
                                         {c.name}
                                     </td>
-                                    <td className="py-3 px-4">{c.phone}</td>
-                                    <td className="py-3 px-4 truncate max-w-xs">{c.address}</td>
-                                    <td className="py-3 px-4">
-                                        <div className="flex gap-3 text-pink-400 text-lg">
+                                    <td className="py-3 px-4 text-center">{c.phone}</td>
+                                    <td className="py-3 px-4 truncate max-w-xs text-center">{c.address}</td>
+                                    <td className="py-3 px-4 text-center">
+                                        <div className="flex gap-3 text-[#EB627D] text-lg">
                                             <button
                                                 title="View"
                                                 onClick={() => navigate(`/viewdetails/`)}
@@ -220,7 +220,7 @@ const CustomerList = () => {
                                         <span className="break-words">{c.address}</span>
                                     </div>
                                 </div>
-                                <div className="flex gap-4 px-4 pb-4 mt-2 text-pink-400 text-xl">
+                                <div className="flex gap-4 px-4 pb-4 mt-2 text-[#EB627D] text-xl">
                                     <button
                                                 title="View"
                                                 onClick={() => navigate(`/viewdetails/`)}
@@ -245,16 +245,16 @@ const CustomerList = () => {
                     </div>
                     <div className="flex gap-2">
                         <button
-                            className="border border-pink-300 rounded px-3 py-1 text-pink-400 hover:bg-pink-50 transition text-sm"
+                            className="border border-pink-300 rounded px-3 py-1 text-[#EB627D] hover:bg-pink-50 transition text-sm"
                             disabled={page === 1}
                         >
                             Previous
                         </button>
-                        <span className="border border-pink-300 rounded px-3 py-1 text-pink-400 bg-pink-50 text-sm">
+                        <span className="border border-pink-300 rounded px-3 py-1 text-[#EB627D] bg-pink-50 text-sm">
                             {page}
                         </span>
                         <button
-                            className="border border-pink-300 rounded px-3 py-1 text-pink-400 hover:bg-pink-50 transition text-sm"
+                            className="border border-pink-300 rounded px-3 py-1 text-[#EB627D] hover:bg-pink-50 transition text-sm"
                             disabled
                         >
                             Next

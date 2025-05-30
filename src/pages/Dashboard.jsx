@@ -99,7 +99,7 @@ const UpArrow = ({ color = "#7C5AFF", bg = "#ECEAFF" }) => (
 
 export default function Dashboard() {
     return (
-        <div className="min-h-screen flex bg-[#F6F8FB] font-sans">
+        <div className="min-h-screen flex-10 bg-[#F6F8FB] font-sans">
             {/* Sidebar */}
             {/* <Sidebar /> */}
 

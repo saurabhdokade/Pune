@@ -31,7 +31,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
       {/* Navigation Menu */}
       <ul className="p-4 space-y-3 text-sm text-white">
-        <li className="flex items-center space-x-2 font-bold bg-white/20 px-3 py-2 rounded-md">
+        <li className="flex items-center space-x-2 font-bold bg-white/20 px-3 py-2 rounded-md"
+        onClick={() => navigate("/dashboard")}
+        >
           <FaTachometerAlt />
           <span>Dashboard</span>
         </li>
