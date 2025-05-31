@@ -26,7 +26,7 @@ const deliveryBoys = [
 
 export default function BranchDeliveryBoyTable() {
     return (
-    <div className="min-h-screen bg-[#F6F8FB] p-4 font-sans  p-6 mb-4 mt-16">
+    <div className="min-h-screen bg-[#F6F8FB] p-4 font-sans  p-6 mb-4 mt-16 ">
             {/* <div className="w-full max-w-5xl"> */}
                 <h2 className="text-center text-2xl font-semibold text-[#F25C7A] mb-8 border-b-2 border-b-gray-100 pb-2 tracking-wide">
                     <span className="font-bold" style={{ letterSpacing: 1 }}>View&nbsp; Branch Info</span>
