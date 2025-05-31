@@ -164,6 +164,7 @@ const CustomerList = () => {
                                         <div className="flex gap-3 text-[#EB627D] text-lg">
                                             <button
                                                 title="View"
+                                                className="cursor-pointer"
                                                 onClick={() => navigate(`/viewdetails/`)}
                                             >
                                                 <FaEye />

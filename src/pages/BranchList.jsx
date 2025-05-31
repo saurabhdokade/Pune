@@ -1,8 +1,11 @@
+//branch list
+ 
+ 
 import React, { useState } from "react";
 import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
-
+ 
 const customers = [
   {
     id: 1,
@@ -40,37 +43,40 @@ const customers = [
     img: "https://randomuser.me/api/portraits/women/5.jpg",
   },
 ];
-
+ 
 const branches = [
   { value: "supply", label: "Supply Wing" },
   { value: "sales", label: "Sales Wing" },
 ];
-
-const CustomerList = () => {
+ 
+const BranchList = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [branch, setBranch] = useState("supply");
   const [sortAsc, setSortAsc] = useState(true);
   const [page] = useState(1);
-
+ 
   // Filtered and sorted data
   const filtered = customers
     .filter((c) => c.name.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) =>
       sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
     );
-
+    const handleRedirect = () => {
+    navigate("/addbranch");
+  };
+ 
   return (
     // <div className="min-h-screen bg-[#F6F8FB] p-2 md:p-4 font-sans p-6 mb-4 mt-14 ">
     <div className="min-h-screen bg-[#F6F8FB] p-4 font-sans  p-6 mb-4 mt-14">
-
+ 
       <Navbar />
       <div className="max-w-6xl mx-auto w-full">
         {/* Top Controls */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-8 mt-6">
           <h2 className="text-pink-600 font-semibold text-xl md:text-2xl">
-            Delivery Boy List
-
+            Branch List
+ 
           </h2>
           <div className="relative w-full md:w-72 mt-2 md:mt-0">
             <input
@@ -100,11 +106,7 @@ const CustomerList = () => {
                 Select Branch
               </label>
               <button 
-              className="bg-[#EB627D] hover:bg-[#EB627D] cursor-pointer transition text-white font-medium rounded-md px-8 py-2 text-base mt-2 md:mt-0"
-                                    onClick={() => navigate(`/adddeliveryboy/`)}
-
-              // adddeliveryboy
-              >
+               onClick={handleRedirect} className="bg-[#EB627D] cursor-pointer hover:bg-[#EB627D] transition text-white font-medium rounded-md px-8 py-2 text-base mt-2 md:mt-0">
                 + Add
               </button>
             </div>
@@ -178,16 +180,11 @@ const CustomerList = () => {
                       <button
                         title="View"
                         className="cursor-pointer"
-                        onClick={() => navigate(`/deliveryboyinfo/`)}
+                        onClick={() => navigate(`/view-branch-info/`)}
                       >
                         <FaEye />
                       </button>
-                      <button 
-                      title="Edit"
-                      className="cursor-pointer"
-                      onClick={() => navigate(`/editdeliveryboy/`)}
-                      // editdeliveryboy
-                      >
+                      <button title="Edit">
                         <FaEdit />
                       </button>
                       <button title="Delete">
@@ -200,7 +197,7 @@ const CustomerList = () => {
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={5} className="py-6 text-center text-gray-400">
-                    No DevliveryBoy found.
+                    No customers found.
                   </td>
                 </tr>
               )}
@@ -210,7 +207,7 @@ const CustomerList = () => {
           <div className="md:hidden">
             {filtered.length === 0 && (
               <div className="py-6 text-center text-gray-400">
-                No DevliveryBoy found.
+                No customers found.
               </div>
             )}
             {filtered.map((c, i) => (
@@ -235,20 +232,21 @@ const CustomerList = () => {
                     {c.phone}
                   </div>
                   <div>
-                    <span className="font-semibold">Address: </span>
-                    <span className="break-words">{c.address}</span>
+                    <span className="font-semibold">Email Address: </span>
+                    <span className="break-words">{c.email}</span>
                   </div>
                 </div>
                 <div className="flex gap-4 px-4 pb-4 mt-2 text-[#EB627D] text-xl">
                   <button
                     title="View"
-                    onClick={() => navigate(`/deliveryboyinfo/`)}
+                    className="cursor-pointer"
+                    onClick={() => navigate(`/view-branch-info/`)}
                   >
                     <FaEye />
                   </button>
                   <button 
                   title="Edit"
-                  onClick={() => navigate(`/editdeliveryboy/`)}
+                  className="cursor-pointer"
                   >
                     <FaEdit />
                   </button>
@@ -287,5 +285,5 @@ const CustomerList = () => {
     </div>
   );
 };
-
-export default CustomerList;
+ 
+export default BranchList;

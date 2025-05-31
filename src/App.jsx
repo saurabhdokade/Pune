@@ -9,6 +9,14 @@ import { AuthProvider } from './components/AuthContext';
 import CustomerList from './pages/CustomerList';
 import ViewCustomerInfo from './pages/ViewCustomerDetails';
 import DeliveryBoyList from './pages/DeliveryboyList';
+import BranchDeliveryBoyTable from './pages/BranchDeliveryBoyTable';
+import BranchInfo from './pages/BranchInfo';
+import BranchList from './pages/Branchlist';
+import ViewDeliveryBoyInfo from './pages/ViewDeliveryBoyInfo';
+import EditDeliveryBoyInfo from './pages/Editdeliveryboyinfo';
+import AddDeliveryBoy from './pages/AddDevliveryBoy';
+import AddBranch from './pages/AddBranch';
+import BranchProductDetailsPage from './pages/BranchProducts';
 
 function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -74,7 +82,7 @@ function AppContent() {
         {!hideSidebarAndNavbar && (
           <Navbar toggleSidebar={() => setSidebarOpen(prev => !prev)} />
         )}
-        <div className="flex-1 p-1 overflow-y-auto bg-[#2F5383] min-h-screen">
+        <div className="flex-1 p-1 overflow-y-auto bg-gray min-h-screen">
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
@@ -82,6 +90,14 @@ function AppContent() {
             <Route path="/customers" element={<CustomerList />} />
             <Route path='/viewdetails' element={<ViewCustomerInfo />} />
             <Route path='/deliveryboys' element={<DeliveryBoyList />} />
+            <Route path='/deliveryboyinfo' element={<ViewDeliveryBoyInfo />} />
+            <Route path='/editdeliveryboy' element={<EditDeliveryBoyInfo />} />
+            <Route path='/adddeliveryboy' element={<AddDeliveryBoy />} />
+            <Route path='/branchdeliveryboytable' element={<BranchDeliveryBoyTable />} />
+            <Route path='/branchproduct' element={<BranchProductDetailsPage />} />
+            <Route path='/addbranch' element={<AddBranch />} />
+            <Route path='/view-branch-info' element={<BranchInfo />} />
+            <Route path='/branches' element={<BranchList />} />
             {/* Add more routes here */}
           </Routes>
         </div>

@@ -10,9 +10,14 @@ import {
   FaCog,
   FaSignOutAlt,
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Helper function to check if a route is active
+  const isActive = (path) => location.pathname === path;
 
   return (
     <div
@@ -31,56 +36,88 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
       {/* Navigation Menu */}
       <ul className="p-4 space-y-3 text-sm text-white">
-        <li className="flex items-center space-x-2 font-bold bg-white/20 px-3 py-2 rounded-md"
-        onClick={() => navigate("/dashboard")}
+        <li
+          className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer 
+            ${isActive("/dashboard") ? "font-bold bg-white/20" : "hover:bg-white/10"}`}
+          onClick={() => navigate("/dashboard")}
         >
           <FaTachometerAlt />
           <span>Dashboard</span>
         </li>
 
         <li
-          className="flex items-center space-x-2 hover:bg-white/10 px-3 py-2 rounded-md cursor-pointer"
+          className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer 
+            ${isActive("/customers") ? "font-bold bg-white/20" : "hover:bg-white/10"}`}
           onClick={() => navigate("/customers")}
         >
           <FaUsers />
           <span>Customer</span>
         </li>
 
-        <li className="flex items-center space-x-2 hover:bg-white/10 px-3 py-2 rounded-md cursor-pointer">
+        <li
+          className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer 
+            ${isActive("/branches") ? "font-bold bg-white/20" : "hover:bg-white/10"}`}
+          onClick={() => navigate("/branches")}
+        >
           <FaStore />
           <span>Branch</span>
         </li>
 
-        <li className="flex items-center space-x-2 hover:bg-white/10 px-3 py-2 rounded-md cursor-pointer"
-        onClick={() => navigate("/deliveryboys")}
+        <li
+          className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer 
+            ${isActive("/deliveryboys") ? "font-bold bg-white/20" : "hover:bg-white/10"}`}
+          onClick={() => navigate("/deliveryboys")}
         >
           <FaMotorcycle />
           <span>Delivery Boy</span>
         </li>
 
-        <li className="flex items-center space-x-2 hover:bg-white/10 px-3 py-2 rounded-md cursor-pointer">
+        <li
+          className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer 
+            ${isActive("/orders") ? "font-bold bg-white/20" : "hover:bg-white/10"}`}
+          onClick={() => navigate("/orders")}
+        >
           <FaShoppingCart />
           <span>Orders</span>
         </li>
 
-        <li className="flex items-center space-x-2 hover:bg-white/10 px-3 py-2 rounded-md cursor-pointer">
+        <li
+          className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer 
+            ${isActive("/notifications") ? "font-bold bg-white/20" : "hover:bg-white/10"}`}
+          onClick={() => navigate("/notifications")}
+        >
           <FaBell />
           <span>Notification</span>
         </li>
 
-        <li className="flex items-center space-x-2 hover:bg-white/10 px-3 py-2 rounded-md cursor-pointer">
+        <li
+          className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer 
+            ${isActive("/payments") ? "font-bold bg-white/20" : "hover:bg-white/10"}`}
+          onClick={() => navigate("/payments")}
+        >
           <FaCreditCard />
           <span>Payments</span>
         </li>
 
-        <li className="flex items-center space-x-2 hover:bg-white/10 px-3 py-2 rounded-md cursor-pointer">
+        <li
+          className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer 
+            ${isActive("/settings") ? "font-bold bg-white/20" : "hover:bg-white/10"}`}
+          onClick={() => navigate("/settings")}
+        >
           <FaCog />
           <span>Settings</span>
         </li>
       </ul>
 
       {/* Logout */}
-      <div className="absolute bottom-4 left-4 flex items-center space-x-2 text-white hover:text-gray-300 cursor-pointer">
+      <div
+        className="absolute bottom-4 left-4 flex items-center space-x-2 text-white hover:text-gray-300 cursor-pointer"
+        onClick={() => {
+          // Implement logout logic here (e.g., clearing tokens, redirecting to login)
+          console.log("Logging out...");
+          navigate("/login");
+        }}
+      >
         <FaSignOutAlt />
         <span>Logout</span>
       </div>
