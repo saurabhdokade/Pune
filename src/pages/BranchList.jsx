@@ -3,6 +3,10 @@ import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+const baseurl = import.meta.env.REACT_APP_BASE_URL || "https://api.citycentermall.com";
 
 const branches = [
   { value: "supply", label: "Supply Wing" },
@@ -19,6 +23,11 @@ const BranchList = () => {
   const [sellers, setSellers] = useState([]);
   const [page, setPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [deleting, setDeleting] = useState(null);
+
+  // Delete confirm popup
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [sellerToDelete, setSellerToDelete] = useState(null);
 
   // Fetch sellers from API
   useEffect(() => {
@@ -29,24 +38,57 @@ const BranchList = () => {
   const fetchSellers = async () => {
     try {
       const response = await axios.get(
-        `https://api.citycentermall.com/api/v1/super-admin/getallseller`, {
+        `${baseurl}/api/v1/super-admin/getallseller`, {
           params: {
             page,
             limit: PAGE_SIZE,
-            branch, // only if your API supports branch filtering
+            branch,
             search
           }
         }
       );
-      // API should return: { data: [...], total: number }
       const { data, total } = response.data;
       setSellers(data || []);
       setTotalRecords(total || 0);
     } catch (error) {
       setSellers([]);
       setTotalRecords(0);
-      console.error("Error fetching sellers:", error);
+      toast.error("Error fetching sellers");
     }
+  };
+
+  // Show popup for delete confirmation
+  const handleDeleteClick = (vendorId) => {
+    setSellerToDelete(vendorId);
+    setShowDeletePopup(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!sellerToDelete) return;
+    setDeleting(sellerToDelete);
+    try {
+      const res = await axios.delete(
+        `${baseurl}/api/v1/super-admin/delete-seller/${sellerToDelete}`
+      );
+      toast.success(
+        res.data && res.data.message
+          ? res.data.message
+          : "Seller deleted successfully"
+      );
+      setShowDeletePopup(false);
+      setSellerToDelete(null);
+      fetchSellers();
+    } catch (err) {
+      const errMsg = err.response?.data?.message || "Delete failed";
+      toast.error(errMsg);
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeletePopup(false);
+    setSellerToDelete(null);
   };
 
   // Pagination controls
@@ -66,9 +108,38 @@ const BranchList = () => {
   const rowNumber = (i) => String((page - 1) * PAGE_SIZE + i + 1).padStart(2, "0");
 
   return (
-    <div className="min-h-screen w-full bg-[#F6F8FB] p-4 font-sans mb-4 mt-14">
+    <div className="min-h-screen w-full bg-[#F6F8FB] p-4 font-sans mb-4 mt-14 relative">
+      <ToastContainer position="top-center" autoClose={2000} />
       <Navbar />
-      <div className="mx-auto w-full">
+
+      {/* Delete Confirmation Popup - NO Black background, just centered box */}
+      {showDeletePopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-auto">
+          <div className="relative z-10 bg-white rounded-lg shadow-lg p-8 max-w-sm w-full flex flex-col items-center border">
+            <h4 className="text-xl font-bold mb-4 text-gray-800 text-center">
+              Are you sure you want to delete this seller?
+            </h4>
+            <div className="flex gap-4 mt-2">
+              <button
+                className="bg-red-600 text-white cursor-pointer px-6 py-2 rounded font-semibold hover:bg-red-700"
+                onClick={handleConfirmDelete}
+                disabled={deleting}
+              >
+                {deleting ? "Deleting..." : "Yes, Delete"}
+              </button>
+              <button
+                className="bg-gray-200 cursor-pointer text-gray-800 px-6 py-2 rounded font-semibold hover:bg-gray-300"
+                onClick={handleCancelDelete}
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div>
         {/* Top Controls */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-8 mt-6">
           <h2 className="text-pink-600 font-semibold text-xl md:text-2xl">
@@ -173,7 +244,13 @@ const BranchList = () => {
                       >
                         <FaEdit />
                       </button>
-                      <button className="text-red-500  cursor-pointer" type="button" title="Delete">
+                      <button
+                        className="text-red-500 cursor-pointer"
+                        type="button"
+                        title="Delete"
+                        onClick={() => handleDeleteClick(c.id)}
+                        disabled={deleting === c.id}
+                      >
                         <FaTrash />
                       </button>
                     </td>
@@ -204,7 +281,7 @@ const BranchList = () => {
                   </span>
                   <div className="flex gap-2">
                     <button
-                      className="text-blue-500  cursor-pointer"
+                      className="text-blue-500 cursor-pointer"
                       onClick={() => navigate(`/view-branch-info/${c.id}`)}
                       title="View"
                       type="button"
@@ -212,14 +289,20 @@ const BranchList = () => {
                       <FaEye />
                     </button>
                     <button
-                      className="text-yellow-500  cursor-pointer"
+                      className="text-yellow-500 cursor-pointer"
                       onClick={() => navigate(`/editbranch/${c.id}`)}
                       title="Edit"
                       type="button"
                     >
                       <FaEdit />
                     </button>
-                    <button className="text-red-500  cursor-pointer" type="button" title="Delete">
+                    <button
+                      className="text-red-500 cursor-pointer"
+                      type="button"
+                      title="Delete"
+                      onClick={() => handleDeleteClick(c.id)}
+                      disabled={deleting === c.id}
+                    >
                       <FaTrash />
                     </button>
                   </div>
@@ -244,7 +327,7 @@ const BranchList = () => {
           </div>
           <div className="flex gap-2">
             <button
-              className="border border-pink-300  cursor-pointer rounded px-3 py-1 text-[#EB627D] hover:bg-pink-50 transition text-sm"
+              className="border border-pink-300 cursor-pointer rounded px-3 py-1 text-[#EB627D] hover:bg-pink-50 transition text-sm"
               disabled={page === 1}
               onClick={handlePrev}
             >
@@ -254,7 +337,7 @@ const BranchList = () => {
               {page}
             </span>
             <button
-              className="border border-pink-300  cursor-pointer rounded px-3 py-1 text-[#EB627D] hover:bg-pink-50 transition text-sm"
+              className="border border-pink-300 cursor-pointer rounded px-3 py-1 text-[#EB627D] hover:bg-pink-50 transition text-sm"
               disabled={page === totalPages || totalPages === 0}
               onClick={handleNext}
             >
