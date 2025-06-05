@@ -56,8 +56,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
         <li
           className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer 
-            ${isActive("/branches") ? "font-bold bg-white/20" : "hover:bg-white/10"}`}
-          onClick={() => navigate("/branches")}
+            ${isActive("/branchlist") ? "font-bold bg-white/20" : "hover:bg-white/10"}`}
+          onClick={() => navigate("/branchlist")}
         >
           <FaStore />
           <span>Branch</span>

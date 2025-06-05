@@ -100,7 +100,7 @@ function AppContent() {
             <Route path='/branchproduct/:sellerId' element={<BranchProductDetailsPage />} />
             <Route path='/addbranch' element={<AddBranch />} />
             <Route path='/view-branch-info/:sellerId' element={<BranchInfo />} />
-            <Route path='/branches' element={<BranchList />} />
+            <Route path='/branchlist' element={<BranchList />} />
             <Route path='/editbranch/:sellerId' element={<EditBranch />} />
             {/* Add more routes here */}
           </Routes>
