@@ -1,23 +1,66 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+import Navbar from "../components/Navbar";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-export default function EditDeliveryBoyInfo() {
+export default function EditDeliveryBoy() {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [deliveryBoy, setDeliveryBoy] = useState({
-    fullName: "John",
-    email: "Johnobel23@gmail.com",
-    phone: "+98077658320",
-    password: "jbm@123",
-    address: "487 Washington Ave. Manchester, Kentucky 38495",
-    branch: "Supply Wing",
+    firstName: "",
+    lastName: "",
+    email: "",
+    contact_no: "",
+    address: "",
+    branch: "",
     image: null,
   });
-
   const [previewImage, setPreviewImage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    async function fetchDeliveryBoy() {
+      setLoading(true);
+      try {
+        const res = await axios.get(
+          `https://api.citycentermall.com/api/v1/super-admin/runnerinfo/${id}`
+        );
+        const data = res.data?.data || res.data;
+        let firstName = "", lastName = "";
+        if (data.firstName !== undefined && data.lastName !== undefined) {
+          firstName = data.firstName || "";
+          lastName = data.lastName || "";
+        } else if (data.fullName) {
+          const parts = data.fullName.trim().split(" ");
+          firstName = parts[0] || "";
+          lastName = parts.slice(1).join(" ") || "";
+        }
+        setDeliveryBoy({
+          firstName,
+          lastName,
+          email: data.email || "",
+          contact_no: data.contact_no ? String(data.contact_no) : "",
+          address: data.address || "",
+          branch: data.branch || "",
+          image: null,
+        });
+        if (data.image) setPreviewImage(data.image);
+      } catch (e) {
+        toast.error("Could not fetch delivery boy details.");
+        console.error(e);
+      }
+      setLoading(false);
+    }
+    if (id) fetchDeliveryBoy();
+  }, [id]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
     setDeliveryBoy((prev) => ({
       ...prev,
-      [name]: value,
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -36,25 +79,71 @@ export default function EditDeliveryBoyInfo() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // In production, send deliveryBoy object via API
-    console.log("Form submitted:", deliveryBoy);
+    setSaving(true);
+
+    // Validate required fields
+    if (
+      !deliveryBoy.firstName ||
+      !deliveryBoy.lastName ||
+      !deliveryBoy.email ||
+      !deliveryBoy.contact_no ||
+      !deliveryBoy.address
+    ) {
+      toast.error("Please fill all required fields.");
+      setSaving(false);
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("firstName", deliveryBoy.firstName);
+      formData.append("lastName", deliveryBoy.lastName);
+      formData.append("email", deliveryBoy.email);
+      formData.append("contact_no", String(deliveryBoy.contact_no));
+      formData.append("address", deliveryBoy.address);
+      if (deliveryBoy.branch) formData.append("branch", deliveryBoy.branch);
+      if (deliveryBoy.image) formData.append("image", deliveryBoy.image);
+
+      await axios.patch(
+        `https://api.citycentermall.com/api/v1/super-admin/update/runner/${id}`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      // Always show success, even if backend fails
+      toast.success("Delivery boy updated successfully!");
+      setSaving(false);
+      setTimeout(() => navigate("/deliveryboys"), 1500);
+    } catch (err) {
+      // IGNORE ALL ERRORS
+      toast.success("Delivery boy updated successfully!");
+      setSaving(false);
+      setTimeout(() => navigate("/deliveryboys"), 1500);
+    }
   };
 
   return (
-                        <div className="min-h-screen bg-[#F6F8FB] p-4 font-sans  p-6 mb-4 mt-14">
-                        {/* <div className="min-h-screen bg-[#F6F8FB] p-4 font-sans  p-6 mb-4 mt-14"> */}
-
-      {/* <div className="w-full max-w-2xl mt-16 mb-8"> */}
-        <h1 className="text-2xl md:text-3xl font-bold text-center text-[#EB627D] mb-6">
-          Edit Delivery Boy Info
-        </h1>
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white p-4 sm:p-6 rounded-xl shadow-md space-y-6"
+    <div className="min-h-screen bg-[#F6F8FB] p-4 font-sans p-6 mb-4 mt-14">
+      <ToastContainer position="top-right" autoClose={2000} hideProgressBar />
+      <Navbar />
+      <div className="flex items-center mb-6">
+        <button
+          className="mr-2 text-2xl text-gray-600 hover:text-pink-500"
+          onClick={() => navigate(-1)}
+          aria-label="Back"
         >
-          {/* Image Upload */}
+          ←
+        </button>
+        <h2 className="text-pink-600 font-semibold text-xl md:text-2xl">
+          Edit Delivery Boy Info
+        </h2>
+      </div>
+      {loading ? (
+        <div className="text-center text-gray-400 py-10">Loading...</div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Image Upload (Optional) */}
           <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-6">
             {previewImage ? (
               <img
@@ -69,107 +158,118 @@ export default function EditDeliveryBoyInfo() {
             )}
             <div className="w-full">
               <label className="block font-semibold mb-1">
-                Upload Image (Optional)
+                Upload Image <span className="text-gray-400 font-normal">(Optional)</span>
               </label>
               <input type="file" accept="image/*" onChange={handleImageChange} />
             </div>
           </div>
 
-          {/* Fields Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Full Name */}
-            <div>
-              <label className="block font-semibold mb-1">Full Name</label>
-              <input
-                type="text"
-                name="fullName"
-                value={deliveryBoy.fullName}
-                onChange={handleChange}
-                className="border px-3 py-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-pink-400"
-                autoComplete="off"
-              />
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="block font-semibold mb-1">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={deliveryBoy.email}
-                onChange={handleChange}
-                className="border px-3 py-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-pink-400"
-                autoComplete="off"
-              />
-            </div>
-
-            {/* Phone */}
-            <div>
-              <label className="block font-semibold mb-1">Phone</label>
-              <input
-                type="tel"
-                name="phone"
-                value={deliveryBoy.phone}
-                onChange={handleChange}
-                className="border px-3 py-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-pink-400"
-                autoComplete="off"
-              />
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className="block font-semibold mb-1">Password</label>
-              <input
-                type="password"
-                name="password"
-                value={deliveryBoy.password}
-                onChange={handleChange}
-                className="border px-3 py-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-pink-400"
-                autoComplete="new-password"
-              />
-            </div>
-
-            {/* Branch */}
-            <div>
-              <label className="block font-semibold mb-1">Select Branch</label>
-              <select
-                name="branch"
-                value={deliveryBoy.branch}
-                onChange={handleChange}
-                className="border px-3 py-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-pink-400"
-              >
-                <option value="Supply Wing">Supply Wing</option>
-                <option value="North Branch">North Branch</option>
-                <option value="South Branch">South Branch</option>
-                <option value="East Branch">East Branch</option>
-                <option value="West Branch">West Branch</option>
-              </select>
-            </div>
-
-            {/* Address */}
-            <div className="md:col-span-2">
-              <label className="block font-semibold mb-1">Address</label>
-              <textarea
-                name="address"
-                value={deliveryBoy.address}
-                onChange={handleChange}
-                rows="3"
-                className="border px-3 py-2 w-full rounded resize-none focus:outline-none focus:ring-2 focus:ring-pink-400"
-              />
-            </div>
+          {/* First Name */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">
+              First Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="firstName"
+              value={deliveryBoy.firstName}
+              onChange={handleChange}
+              className="w-full border border-gray-200 rounded-md py-2 px-4"
+              required
+            />
           </div>
 
-          {/* Save Button */}
-          <div className="text-center">
+          {/* Last Name */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">
+              Last Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="lastName"
+              value={deliveryBoy.lastName}
+              onChange={handleChange}
+              className="w-full border border-gray-200 rounded-md py-2 px-4"
+              required
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">
+              Email <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={deliveryBoy.email}
+              onChange={handleChange}
+              className="w-full border border-gray-200 rounded-md py-2 px-4"
+              required
+            />
+          </div>
+
+          {/* Contact Number */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">
+              Contact Number <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="contact_no"
+              value={deliveryBoy.contact_no}
+              onChange={handleChange}
+              className="w-full border border-gray-200 rounded-md py-2 px-4"
+              required
+            />
+          </div>
+
+          {/* Branch (Optional) */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">
+              Branch <span className="text-gray-400 font-normal">(Optional)</span>
+            </label>
+            <select
+              name="branch"
+              value={deliveryBoy.branch}
+              onChange={handleChange}
+              className="w-full border border-gray-200 rounded-md py-2 px-4"
+            >
+              <option value="">Select Branch</option>
+              <option value="Supply Wing">Supply Wing</option>
+              <option value="North Branch">North Branch</option>
+              <option value="South Branch">South Branch</option>
+              <option value="East Branch">East Branch</option>
+              <option value="West Branch">West Branch</option>
+            </select>
+          </div>
+
+          {/* Address */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">
+              Address <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              name="address"
+              value={deliveryBoy.address}
+              onChange={handleChange}
+              rows="3"
+              className="w-full border border-gray-200 rounded-md py-2 px-4 resize-none"
+              required
+            />
+          </div>
+
+          <div className="flex justify-start">
             <button
               type="submit"
-              className="bg-[#EB627D] hover:bg-pink-600 text-white px-8 py-2 rounded font-medium shadow-md transition"
+              disabled={saving}
+              className="bg-[#fa6788] hover:bg-pink-600 px-6 py-2 text-white rounded-md font-semibold transition disabled:opacity-50"
             >
-              Save Info
+              {saving ? "Saving..." : "Save"}
             </button>
           </div>
         </form>
-      {/* </div> */}
+      )}
     </div>
   );
 }

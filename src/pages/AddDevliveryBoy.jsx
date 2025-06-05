@@ -1,146 +1,287 @@
-//add deliveryboy
- 
- 
 import React, { useState } from "react";
- 
-export default function AddDeliveryBoy() {
+
+export default function AddRunnerForm() {
   const [formData, setFormData] = useState({
-    fullName: "",
+    firstName: "",
+    lastName: "",
     email: "",
-    phone: "",
-    password: "",
     address: "",
-    branch: "",
-    image: null,
+    city: "",
+    isAvailable: true,
+    current_location: { latitude: "", longitude: "" },
+    state: "",
+    pin_code: "",
+    contact_no: "",
+    vehicleType: "",
+    vehicleNumber: "",
+    drivingLicenseNo: "",
+    aadharNumber: "",
+    account_no: "",
+    account_holder_name: "",
+    bank_name: "",
+    IFSC_code: "",
+    branch_name: "",
+    UPI_id: "",
   });
- 
+
+  // File inputs state
+  const [licenseImage, setLicenseImage] = useState(null);
+  const [aadharImage, setAadharImage] = useState(null);
+  const [personalImage, setPersonalImage] = useState(null);
+  const [policeVerification, setPoliceVerification] = useState(null);
+
+  // Handle input change for text fields
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === "image") {
-      setFormData({ ...formData, image: files[0] });
+    const { name, value, type, checked } = e.target;
+    if (name === "isAvailable") {
+      setFormData({ ...formData, [name]: checked });
+    } else if (name === "latitude" || name === "longitude") {
+      setFormData({
+        ...formData,
+        current_location: {
+          ...formData.current_location,
+          [name]: value,
+        },
+      });
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
- 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form Submitted:", formData);
+
+  // Handle file input changes
+  const handleFileChange = (e, setter) => {
+    setter(e.target.files[0]);
   };
- 
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Create FormData object to send multipart/form-data
+    const data = new FormData();
+
+    // Append all text fields
+    data.append("firstName", formData.firstName);
+    data.append("lastName", formData.lastName);
+    data.append("email", formData.email);
+    data.append("address", formData.address);
+    data.append("city", formData.city);
+    data.append("isAvailable", formData.isAvailable); // boolean as string
+    data.append("current_location", JSON.stringify({
+      latitude: parseFloat(formData.current_location.latitude),
+      longitude: parseFloat(formData.current_location.longitude),
+    }));
+    data.append("state", formData.state);
+    data.append("pin_code", formData.pin_code);
+    data.append("contact_no", formData.contact_no);
+    data.append("vehicleType", formData.vehicleType);
+    data.append("vehicleNumber", formData.vehicleNumber);
+    data.append("drivingLicenseNo", formData.drivingLicenseNo);
+    data.append("aadharNumber", formData.aadharNumber);
+    data.append("account_no", formData.account_no);
+    data.append("account_holder_name", formData.account_holder_name);
+    data.append("bank_name", formData.bank_name);
+    data.append("IFSC_code", formData.IFSC_code);
+    data.append("branch_name", formData.branch_name);
+    data.append("UPI_id", formData.UPI_id);
+
+    // Append files if they exist
+    if (licenseImage) data.append("licenseImage", licenseImage);
+    if (aadharImage) data.append("aadharImage", aadharImage);
+    if (personalImage) data.append("personalImage", personalImage);
+    if (policeVerification) data.append("policeVerification", policeVerification);
+
+    try {
+      const response = await fetch(
+        "https://api.citycentermall.com/api/v1/super-admin/register/runner",
+        {
+          method: "POST",
+          headers: {
+          },
+          body: data,
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert("Runner registered successfully!");
+        // Reset form after success
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          address: "",
+          city: "",
+          isAvailable: true,
+          current_location: { latitude: "", longitude: "" },
+          state: "",
+          pin_code: "",
+          contact_no: "",
+          vehicleType: "",
+          vehicleNumber: "",
+          drivingLicenseNo: "",
+          aadharNumber: "",
+          account_no: "",
+          account_holder_name: "",
+          bank_name: "",
+          IFSC_code: "",
+          branch_name: "",
+          UPI_id: "",
+        });
+        setLicenseImage(null);
+        setAadharImage(null);
+        setPersonalImage(null);
+        setPoliceVerification(null);
+      } else {
+        alert("Failed to register runner: " + (result.message || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error occurred while registering runner.");
+    }
+  };
+
   return (
-    <div className="flex min-h-screen bg-white text-gray-700 font-sans pt-16">
-      {/* Assuming sidebar is outside or included in parent layout */}
-      <div className="flex-1 flex flex-col">
-        <main className="flex-grow overflow-y-auto bg-white p-6 sm:p-10 pt-20">
-          <div className="w-full max-w-full mx-auto">
-            <h2 className="text-pink-600 font-semibold text-center mb-8 text-2xl sm:text-3xl cursor-pointer hover:underline">
-      Add Delivery Boy
-    </h2>
-            <form onSubmit={handleSubmit} className="space-y-6 w-full">
-              <div>
-                <label className="block text-sm font-medium mb-2">Full Name</label>
-                <input
-                  type="text"
-                  name="fullName"
-                  placeholder="Enter Full Name"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  required
-                />
-              </div>
- 
-              <div>
-                <label className="block text-sm font-medium mb-2">Email Address</label>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Enter Email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  required
-                />
-              </div>
- 
-              <div>
-                <label className="block text-sm font-medium mb-2">Phone Number</label>
-                <input
-                  type="tel"
-                  name="phone"
-                  placeholder="Enter Phone Number"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  required
-                />
-              </div>
- 
-              <div>
-                <label className="block text-sm font-medium mb-2">Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Create Password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  required
-                />
-              </div>
- 
-              <div>
-                <label className="block text-sm font-medium mb-2">Address</label>
-                <input
-                  type="text"
-                  name="address"
-                  placeholder="Enter Full Address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  required
-                />
-              </div>
- 
-              <div>
-                <label className="block text-sm font-medium mb-2">Select Branch</label>
-                <select
-                  name="branch"
-                  value={formData.branch}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  required
-                >
-                  <option value="">Select</option>
-                  <option value="branch-1">Branch 1</option>
-                  <option value="branch-2">Branch 2</option>
-                </select>
-              </div>
- 
-              <div>
-                <label className="block text-sm font-medium mb-2">Image (Optional)</label>
-                <input
-                  type="file"
-                  name="image"
-                  accept="image/*"
-                  onChange={handleChange}
-                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:bg-pink-100 file:text-pink-700 hover:file:bg-pink-200"
-                />
-              </div>
- 
-              <div>
-                <button
-                  type="submit"
-                  className="w-full bg-pink-500 hover:bg-pink-600 text-white py-3 rounded-md text-base font-semibold transition"
-                >
-                  Add
-                </button>
-              </div>
-            </form>
-          </div>
-        </main>
+    <div className="min-h-screen bg-[#F6F8FB] p-4 font-sans  p-6 mb-4 mt-16 ">
+    <h2 className="text-center text-pink-600 font-semibold text-lg mb-8">Add Delivery Boy</h2>
+    <form onSubmit={handleSubmit} className="space-y-5">
+
+      <div>
+        <label className="block text-sm font-medium mb-1">First Name *</label>
+        <input name="firstName" required value={formData.firstName} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter First Name" />
       </div>
-    </div>
-  );
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Last Name *</label>
+        <input name="lastName" required value={formData.lastName} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter Last Name" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Email *</label>
+        <input type="email" name="email" required value={formData.email} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter Email" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Address *</label>
+        <input name="address" required value={formData.address} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter Address" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">City *</label>
+        <input name="city" required value={formData.city} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter City" />
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <label className="text-sm font-medium">Is Available?</label>
+        <input type="checkbox" name="isAvailable" checked={formData.isAvailable} onChange={handleChange} />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Current Location Latitude *</label>
+        <input type="number" step="any" name="latitude" required value={formData.current_location.latitude} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Latitude" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Current Location Longitude *</label>
+        <input type="number" step="any" name="longitude" required value={formData.current_location.longitude} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Longitude" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">State *</label>
+        <input name="state" required value={formData.state} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter State" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Pin Code *</label>
+        <input type="number" name="pin_code" required value={formData.pin_code} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter Pin Code" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Contact Number *</label>
+        <input name="contact_no" required value={formData.contact_no} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter Contact Number" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Vehicle Type *</label>
+        <input name="vehicleType" required value={formData.vehicleType} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter Vehicle Type" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Vehicle Number *</label>
+        <input name="vehicleNumber" required value={formData.vehicleNumber} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter Vehicle Number" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Driving License Number *</label>
+        <input name="drivingLicenseNo" required value={formData.drivingLicenseNo} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter DL Number" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Aadhar Number *</label>
+        <input name="aadharNumber" required value={formData.aadharNumber} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter Aadhar Number" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Bank Account Number *</label>
+        <input name="account_no" required value={formData.account_no} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter Account Number" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Account Holder Name *</label>
+        <input name="account_holder_name" required value={formData.account_holder_name} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter Holder Name" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Bank Name *</label>
+        <input name="bank_name" required value={formData.bank_name} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter Bank Name" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">IFSC Code *</label>
+        <input name="IFSC_code" required value={formData.IFSC_code} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter IFSC" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Branch Name *</label>
+        <input name="branch_name" required value={formData.branch_name} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter Branch Name" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">UPI ID *</label>
+        <input name="UPI_id" required value={formData.UPI_id} onChange={handleChange} className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none" placeholder="Enter UPI ID" />
+      </div>
+
+      {/* File Inputs */}
+      <div>
+        <label className="block text-sm font-medium mb-1">Driving License Image *</label>
+        <input type="file" accept="image/*" required onChange={(e) => handleFileChange(e, setLicenseImage)} className="w-full" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Aadhar Card Image *</label>
+        <input type="file" accept="image/*" required onChange={(e) => handleFileChange(e, setAadharImage)} className="w-full" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Personal Photo *</label>
+        <input type="file" accept="image/*" required onChange={(e) => handleFileChange(e, setPersonalImage)} className="w-full" />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Police Verification Certificate Image *</label>
+        <input type="file" accept="image/*" required onChange={(e) => handleFileChange(e, setPoliceVerification)} className="w-full" />
+      </div>
+
+      {/* Submit Button */}
+      <div className="pt-4">
+        <button
+          type="submit"
+          className="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 rounded"
+        >
+          Register Runner
+        </button>
+      </div>
+    </form>
+  </div>
+);
 }

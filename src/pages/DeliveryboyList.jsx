@@ -1,84 +1,130 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
-import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const customers = [
-  {
-    id: 1,
-    name: "Jacob Jones",
-    email: "example@gmail.com",
-    phone: "+919876543210",
-    img: "https://randomuser.me/api/portraits/men/1.jpg",
-  },
-  {
-    id: 2,
-    name: "Esther Howard",
-    phone: "+919876555210",
-    email: "example@gmail.com",
-    img: "https://randomuser.me/api/portraits/women/2.jpg",
-  },
-  {
-    id: 3,
-    name: "Cody Fisher",
-    phone: "+916276543210",
-    email: "example@gmail.com",
-    img: "https://randomuser.me/api/portraits/women/3.jpg",
-  },
-  {
-    id: 4,
-    name: "Darrell Steward",
-    phone: "+919876003210",
-    email: "example@gmail.com",
-    img: "https://randomuser.me/api/portraits/men/4.jpg",
-  },
-  {
-    id: 5,
-    name: "Dianne Russell",
-    phone: "+919876567710",
-    email: "example@gmail.com",
-    img: "https://randomuser.me/api/portraits/women/5.jpg",
-  },
-];
+const PAGE_SIZE = 10;
 
-const branches = [
-  { value: "supply", label: "Supply Wing" },
-  { value: "sales", label: "Sales Wing" },
-];
-
-const CustomerList = () => {
-  const navigate = useNavigate();
+const DriverList = () => {
   const [search, setSearch] = useState("");
-  const [branch, setBranch] = useState("supply");
   const [sortAsc, setSortAsc] = useState(true);
-  const [page] = useState(1);
+  const [page, setPage] = useState(1);
+  const [drivers, setDrivers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
+  const [expandedDriver, setExpandedDriver] = useState({});
+  const navigate = useNavigate();
 
-  // Filtered and sorted data
-  const filtered = customers
-    .filter((c) => c.name.toLowerCase().includes(search.toLowerCase()))
-    .sort((a, b) =>
-      sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
-    );
+  useEffect(() => {
+    const fetchDrivers = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get("https://api.citycentermall.com/api/v1/super-admin/runners");
+        let data = [];
+        if (Array.isArray(res.data)) {
+          data = res.data;
+        } else if (Array.isArray(res.data.data)) {
+          data = res.data.data;
+        } else if (res.data.drivers && Array.isArray(res.data.drivers)) {
+          data = res.data.drivers;
+        }
+        setDrivers(data);
+      } catch (err) {
+        toast.error("Failed to fetch drivers");
+        setDrivers([]);
+      }
+      setLoading(false);
+    };
+    fetchDrivers();
+  }, []);
+
+  // Expand row and fetch driver info if needed
+  const toggleExpand = async (id) => {
+    if (expandedId === id) {
+      setExpandedId(null);
+      return;
+    }
+    if (!expandedDriver[id]) {
+      try {
+        const res = await axios.get(`https://api.citycentermall.com/api/v1/super-admin/runnerinfo/${id}`);
+        setExpandedDriver((prev) => ({
+          ...prev,
+          [id]: res.data?.data || res.data,
+        }));
+      } catch {
+        toast.error("Failed to load driver details.");
+        setExpandedDriver((prev) => ({
+          ...prev,
+          [id]: null,
+        }));
+      }
+    }
+    setExpandedId(id);
+  };
+
+  // Delete handler
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this driver?")) return;
+    setDeletingId(id);
+    try {
+      await axios.delete(`https://api.citycentermall.com/api/v1/super-admin/runnerinfo/${id}`);
+      setDrivers((prev) => prev.filter((d) => d._id.$oid !== id));
+      toast.success("Driver deleted successfully!");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to delete driver. Please try again."
+      );
+    }
+    setDeletingId(null);
+  };
+
+  // Filter and sort
+  const filtered = drivers
+    .filter((d) => {
+      const fullName = `${d.firstName || ""} ${d.lastName || ""}`.toLowerCase();
+      return fullName.includes(search.toLowerCase());
+    })
+    .sort((a, b) => {
+      const aName = `${a.firstName || ""} ${a.lastName || ""}`;
+      const bName = `${b.firstName || ""} ${b.lastName || ""}`;
+      return sortAsc ? aName.localeCompare(bName) : bName.localeCompare(aName);
+    });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const pagedFiltered = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages || 1);
+  }, [totalPages, page]);
+
+  const handlePrev = () => {
+    if (page > 1) setPage(page - 1);
+  };
+
+  const handleNext = () => {
+    if (page < totalPages) setPage(page + 1);
+  };
 
   return (
-    // <div className="min-h-screen bg-[#F6F8FB] p-2 md:p-4 font-sans p-6 mb-4 mt-14 ">
-    <div className="min-h-screen bg-[#F6F8FB] p-4 font-sans  p-6 mb-4 mt-14">
-
-      <Navbar />
+    <div className="min-h-screen bg-[#F6F8FB] p-4 font-sans p-6 mb-4 mt-14">
+      <ToastContainer position="top-right" autoClose={2000} />
       <div className="max-w-6xl mx-auto w-full">
-        {/* Top Controls */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-8 mt-6">
           <h2 className="text-pink-600 font-semibold text-xl md:text-2xl">
-            Delivery Boy List
-
+            Driver List
           </h2>
           <div className="relative w-full md:w-72 mt-2 md:mt-0">
             <input
               type="text"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               className="w-full border border-gray-200 rounded-md py-2 pl-10 pr-4 focus:outline-none focus:ring-1 focus:ring-[#EB627D] bg-white text-sm"
-              placeholder="Search here..."
+              placeholder="Search driver..."
             />
             <svg
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"
@@ -92,183 +138,143 @@ const CustomerList = () => {
             </svg>
           </div>
         </div>
-        {/* Branch Select */}
-        <div className="mb-4">
-          <div className="mb-1">
-            <div className="flex items-center justify-between">
-              <label className="block text-gray-700 font-medium mb-1">
-                Select Branch
-              </label>
-              <button 
-              className="bg-[#EB627D] hover:bg-[#EB627D] cursor-pointer transition text-white font-medium rounded-md px-8 py-2 text-base mt-2 md:mt-0"
-                                    onClick={() => navigate(`/adddeliveryboy/`)}
-
-              // adddeliveryboy
-              >
-                + Add
-              </button>
-            </div>
-          </div>
-          <div className="relative w-full md:w-288">
-            <select
-              value={branch}
-              onChange={(e) => setBranch(e.target.value)}
-              className="w-full border border-gray-200 rounded-md py-2 px-4 text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#EB627D] bg-white"
-            >
-              {branches.map((b) => (
-                <option value={b.value} key={b.value}>
-                  {b.label}
-                </option>
-              ))}
-            </select>
-            {/* <svg
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth={2}
-                            viewBox="0 0 24 24"
-                        >
-                            <path d="M19 9l-7 7-7-7" />
-                        </svg> */}
-          </div>
+        <div className="mb-4 flex md:justify-end">
+          <button
+            className="bg-[#EB627D] hover:bg-[#EB627D] cursor-pointer transition text-white font-medium rounded-md px-8 py-2 text-base"
+            onClick={() => navigate(`/adddeliveryboy/`)}
+          >
+            + Add
+          </button>
         </div>
-        {/* Responsive Table */}
-        <div className="rounded-xll shadow bg-white overflow-x-auto">
-          {/* Table for md+ */}
-          <table className="min-w-full text-sm text-gray-800 hidden md:table">
-            <thead>
-              <tr className="bg-[#EB627D] text-white">
-                <th className="font-semibold py-3 px-4 rounded-tl-xll">Sr. No.</th>
-                <th className="font-semibold py-3 px-4 cursor-pointer select-none flex items-center gap-2">
-                  <span>Full Name</span>
-                  <button
-                    onClick={() => setSortAsc((v) => !v)}
-                    className="ml-1 text-white"
-                    aria-label="Sort Name"
-                  >
-                    <span className="inline-block align-middle">↑↓</span>
-                  </button>
-                </th>
-                <th className="font-semibold py-3 px-4">Email Address</th>
-                  <th className="font-semibold py-3 px-4">Phone Number</th>
-                <th className="font-semibold py-3 px-4 rounded-tr-xll text-left">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((c, i) => (
-                <tr
-                  key={c.id}
-                  className={`${i % 2 === 0 ? "bg-white" : "bg-pink-50"}`}
-                >
-                  <td className="py-3 px-4 text-center font-semibold text-gray-700">
-                    {String(i + 1).padStart(2, "0")}
-                  </td>
-                  <td className="py-3 px-4 flex items-center gap-3 font-medium">
-                    <img
-                      src={c.img}
-                      alt={c.name}
-                      className="w-10 h-10 rounded-full object-cover border border-gray-200"
-                    />
-                    {c.name}
-                  </td>
-                  <td className="py-3 px-4 text-center">{c.email}</td>
-                  <td className="py-3 px-4 truncate max-w-xs text-center">{c.phone}</td>
-                  <td className="py-3 px-4 text-center">
-                    <div className="flex gap-3 text-[#EB627D] text-lg">
+
+        <div className="rounded-xll shadow bg-white border rounded-tl-xll">
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm text-gray-800 table-auto rounded-tl-xll">
+              <thead>
+                <tr className="bg-[#EB627D] text-white text-left rounded-tl-xll">
+                  <th className="font-semibold py-3 px-4 rounded-tl-xll">Sr. No.</th>
+                  <th className="font-semibold py-3 px-6 cursor-pointer select-none">
+                    <div className="flex items-center gap-2">
+                      <span>Full Name</span>
                       <button
-                        title="View"
-                        className="cursor-pointer"
-                        onClick={() => navigate(`/deliveryboyinfo/`)}
+                        onClick={() => setSortAsc((v) => !v)}
+                        className="ml-1 text-white"
+                        aria-label="Sort Name"
                       >
-                        <FaEye />
-                      </button>
-                      <button 
-                      title="Edit"
-                      className="cursor-pointer"
-                      onClick={() => navigate(`/editdeliveryboy/`)}
-                      // editdeliveryboy
-                      >
-                        <FaEdit />
-                      </button>
-                      <button title="Delete">
-                        <FaTrash />
+                        <span className="inline-block align-middle">↑↓</span>
                       </button>
                     </div>
-                  </td>
+                  </th>
+                  <th className="font-semibold py-3 px-6">Email</th>
+                  <th className="font-semibold py-3 px-6">Contact No.</th>
+                  <th className="font-semibold py-3 px-6">City</th>
+                  <th className="font-semibold py-3 px-6 rounded-tr-xll">Action</th>
                 </tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="py-6 text-center text-gray-400">
-                    No DevliveryBoy found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-          {/* Mobile Card View */}
-          <div className="md:hidden">
-            {filtered.length === 0 && (
-              <div className="py-6 text-center text-gray-400">
-                No DevliveryBoy found.
-              </div>
-            )}
-            {filtered.map((c, i) => (
-              <div
-                key={c.id}
-                className="flex flex-col bg-white rounded-xl shadow mb-4 border border-pink-100"
-              >
-                <div className="flex items-center gap-3 px-4 pt-4 pb-2">
-                  <img
-                    src={c.img}
-                    alt={c.name}
-                    className="w-12 h-12 rounded-full object-cover border border-gray-200"
-                  />
-                  <div>
-                    <div className="font-semibold text-gray-900">{c.name}</div>
-                    <div className="text-xs text-gray-500">#{String(i + 1).padStart(2, "0")}</div>
-                  </div>
-                </div>
-                <div className="px-4 pb-2 text-gray-700">
-                  <div>
-                    <span className="font-semibold">Phone: </span>
-                    {c.phone}
-                  </div>
-                  <div>
-                    <span className="font-semibold">Address: </span>
-                    <span className="break-words">{c.address}</span>
-                  </div>
-                </div>
-                <div className="flex gap-4 px-4 pb-4 mt-2 text-[#EB627D] text-xl">
-                  <button
-                    title="View"
-                    onClick={() => navigate(`/deliveryboyinfo/`)}
-                  >
-                    <FaEye />
-                  </button>
-                  <button 
-                  title="Edit"
-                  onClick={() => navigate(`/editdeliveryboy/`)}
-                  >
-                    <FaEdit />
-                  </button>
-                  <button title="Delete">
-                    <FaTrash />
-                  </button>
-                </div>
-              </div>
-            ))}
+              </thead>
+              <tbody>
+                {pagedFiltered.map((d, i) => (
+                  <React.Fragment key={d._id?.$oid}>
+                    <tr className={`${i % 2 === 0 ? "bg-white" : "bg-pink-50"}`}>
+                      <td className="py-3 px-6 text-center items-center text-center font-semibold text-gray-700 align-middle">
+                        {String((page - 1) * PAGE_SIZE + i + 1).padStart(2, "0")}
+                      </td>
+                      <td className="py-3 px-6 align-middle">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent((d.firstName || "") + " " + (d.lastName || ""))}&background=EB627D&color=fff`}
+                            alt={d.firstName}
+                            className="w-10 h-10 rounded-full object-cover text-center border border-gray-200"
+                          />
+                          <span className="font-medium">{`${d.firstName || ""} ${d.lastName || ""}`}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-6 align-middle">{d.email}</td>
+                      <td className="py-3 px-6 align-middle">{d.contact_no}</td>
+                      <td className="py-3 px-6 align-middle">{d.city}</td>
+                      <td className="py-3 px-6 align-middle">
+                        <div className="flex gap-3 text-[#EB627D] text-lg">
+                          <button
+                            className="cursor-pointer"
+                            title="View"
+                            onClick={() => toggleExpand(d._id.$oid)}
+                          >
+                            <FaEye />
+                          </button>
+                          <button
+                            title="Edit"
+                            className="cursor-pointer"
+                            onClick={() => navigate(`/editdeliveryboy/${d._id.$oid}`)}
+                          >
+                            <FaEdit />
+                          </button>
+                          <button
+                            title="Delete"
+                            className="cursor-pointer"
+                            onClick={() => handleDelete(d._id.$oid)}
+                            disabled={deletingId === d._id.$oid}
+                          >
+                            {deletingId === d._id.$oid ? (
+                              <span className="animate-spin">⏳</span>
+                            ) : (
+                              <FaTrash />
+                            )}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    {/* Expanded Row */}
+                    {expandedId === d._id.$oid && (
+                      <tr>
+                        <td colSpan={6} className="bg-pink-100 pl-[265px] py-5 px-6 text-gray-700">
+                          {expandedDriver[d._id.$oid] === undefined ? (
+                            <span>Loading...</span>
+                          ) : expandedDriver[d._id.$oid] === null ? (
+                            <span className="text-red-500">Failed to load details.</span>
+                          ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <p><strong>Full Name:</strong> {`${expandedDriver[d._id.$oid]?.firstName || ""} ${expandedDriver[d._id.$oid]?.lastName || ""}`}</p>
+                              <p><strong>Email:</strong> {expandedDriver[d._id.$oid]?.email || "-"}</p>
+                              <p><strong>Contact No.:</strong> {expandedDriver[d._id.$oid]?.contact_no || "-"}</p>
+                              <p><strong>Address:</strong> {expandedDriver[d._id.$oid]?.address || "-"}</p>
+                              <p><strong>City:</strong> {expandedDriver[d._id.$oid]?.city || "-"}</p>
+                              <p><strong>State:</strong> {expandedDriver[d._id.$oid]?.state || "-"}</p>
+                              <p><strong>Pin Code:</strong> {expandedDriver[d._id.$oid]?.pin_code || "-"}</p>
+                              <p><strong>Vehicle ID:</strong> {expandedDriver[d._id.$oid]?.vehicleId?.$oid || "-"}</p>
+                              <p><strong>Bank Details ID:</strong> {expandedDriver[d._id.$oid]?.bankDetailsId?.$oid || "-"}</p>
+                              <p className="md:col-span-2">
+                                <strong>Location:</strong> {expandedDriver[d._id.$oid]?.current_location?.coordinates?.join(", ") || "-"}
+                              </p>
+                              <p><strong>Created At:</strong> {expandedDriver[d._id.$oid]?.createdAt?.$date ? new Date(expandedDriver[d._id.$oid]?.createdAt.$date).toLocaleString() : "-"}</p>
+                              <p><strong>Updated At:</strong> {expandedDriver[d._id.$oid]?.updatedAt?.$date ? new Date(expandedDriver[d._id.$oid]?.updatedAt.$date).toLocaleString() : "-"}</p>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))}
+                {pagedFiltered.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="py-6 text-center text-gray-400">
+                      No drivers found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
-        {/* Footer */}
+        {/* Pagination Footer */}
         <div className="flex flex-col md:flex-row md:justify-between items-center p-4">
           <div className="text-gray-500 text-sm mb-2 md:mb-0">
-            Showing 1 to {filtered.length} of {filtered.length} Entries
+            Showing {filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1} to{" "}
+            {Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length} Entries
           </div>
           <div className="flex gap-2">
             <button
               className="border border-pink-300 rounded px-3 py-1 text-[#EB627D] hover:bg-pink-50 transition text-sm"
               disabled={page === 1}
+              onClick={handlePrev}
             >
               Previous
             </button>
@@ -277,7 +283,8 @@ const CustomerList = () => {
             </span>
             <button
               className="border border-pink-300 rounded px-3 py-1 text-[#EB627D] hover:bg-pink-50 transition text-sm"
-              disabled
+              disabled={page === totalPages || totalPages === 0}
+              onClick={handleNext}
             >
               Next
             </button>
@@ -288,4 +295,4 @@ const CustomerList = () => {
   );
 };
 
-export default CustomerList;
+export default DriverList;

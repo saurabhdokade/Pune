@@ -7,7 +7,6 @@ import {
 import { Star, RefreshCw } from "lucide-react";
 import pendingIcon from '../assets/b11069a4de6e255d90b4a00989a3ea8f73271f4c.png';
 import userIcon from '../assets/1be661da7ec47814f43f5782f152a0db7d07ce14.png';
-import Sidebar from '../components/Sidebar';
 
 // DATA
 const pieData = [
@@ -37,26 +36,26 @@ const cardIcons = [
     <svg width="48" height="48" fill="none" viewBox="0 0 48 48">
         <circle cx="24" cy="24" r="24" fill="#E4FDE3" />
         <g>
-            <circle cx="16" cy="21" r="4" fill="#23C16B"/>
-            <circle cx="32" cy="21" r="4" fill="#23C16B"/>
-            <circle cx="24" cy="17" r="6" fill="#23C16B"/>
-            <rect x="12" y="29" width="24" height="6" rx="3" fill="#23C16B" opacity="0.15"/>
+            <circle cx="16" cy="21" r="4" fill="#23C16B" />
+            <circle cx="32" cy="21" r="4" fill="#23C16B" />
+            <circle cx="24" cy="17" r="6" fill="#23C16B" />
+            <rect x="12" y="29" width="24" height="6" rx="3" fill="#23C16B" opacity="0.15" />
         </g>
     </svg>,
     // Orders
     <svg width="48" height="48" fill="none" viewBox="0 0 48 48">
         <circle cx="24" cy="24" r="24" fill="#FFEAE4" />
         <g>
-            <rect x="14" y="16" width="20" height="16" rx="4" fill="#FF7A59"/>
-            <rect x="18" y="24" width="12" height="4" rx="2" fill="#fff" opacity="0.5"/>
+            <rect x="14" y="16" width="20" height="16" rx="4" fill="#FF7A59" />
+            <rect x="18" y="24" width="12" height="4" rx="2" fill="#fff" opacity="0.5" />
         </g>
     </svg>,
     // Branch
     <svg width="48" height="48" fill="none" viewBox="0 0 48 48">
         <circle cx="24" cy="24" r="24" fill="#E6F2FF" />
         <g>
-            <circle cx="24" cy="22" r="7" fill="#5AA6FF"/>
-            <rect x="18" y="31" width="12" height="4" rx="2" fill="#5AA6FF" opacity="0.15"/>
+            <circle cx="24" cy="22" r="7" fill="#5AA6FF" />
+            <rect x="18" y="31" width="12" height="4" rx="2" fill="#5AA6FF" opacity="0.15" />
             <text x="24" y="26" fontSize="12" textAnchor="middle" fill="#fff" fontWeight="bold">$</text>
         </g>
     </svg>,
@@ -64,18 +63,18 @@ const cardIcons = [
     <svg width="48" height="48" fill="none" viewBox="0 0 48 48">
         <circle cx="24" cy="24" r="24" fill="#FFF4E4" />
         <g>
-            <rect x="17" y="16" width="14" height="16" rx="4" fill="#FF9800"/>
-            <rect x="21" y="24" width="6" height="4" rx="2" fill="#fff" opacity="0.5"/>
-            <polyline points="24,20 28,16 32,20" stroke="#FF9800" strokeWidth="2" fill="none"/>
+            <rect x="17" y="16" width="14" height="16" rx="4" fill="#FF9800" />
+            <rect x="21" y="24" width="6" height="4" rx="2" fill="#fff" opacity="0.5" />
+            <polyline points="24,20 28,16 32,20" stroke="#FF9800" strokeWidth="2" fill="none" />
         </g>
     </svg>,
     // Revenue
     <svg width="48" height="48" fill="none" viewBox="0 0 48 48">
         <circle cx="24" cy="24" r="24" fill="#FFF0F6" />
         <g>
-            <rect x="18" y="22" width="4" height="10" rx="2" fill="#D63384"/>
-            <rect x="24" y="18" width="4" height="14" rx="2" fill="#D63384"/>
-            <rect x="30" y="26" width="4" height="6" rx="2" fill="#D63384"/>
+            <rect x="18" y="22" width="4" height="10" rx="2" fill="#D63384" />
+            <rect x="24" y="18" width="4" height="14" rx="2" fill="#D63384" />
+            <rect x="30" y="26" width="4" height="6" rx="2" fill="#D63384" />
         </g>
     </svg>
 ];
@@ -99,29 +98,28 @@ const UpArrow = ({ color = "#7C5AFF", bg = "#ECEAFF" }) => (
 
 export default function Dashboard() {
     return (
-        <div className="min-h-screen flex-10 bg-[#F6F8FB] font-sans">
-            {/* Sidebar */}
-            {/* <Sidebar /> */}
-
+        <div className="min-h-screen bg-[#F6F8FB] font-sans flex flex-col">
             {/* Main Content */}
-            <div className="flex-10 flex flex-col">
+            <div className="flex-1 flex flex-col">
                 {/* Top Bar */}
-                <div className="bg-[#2F5383] px-10 pt-5 pb-15 p-40 font-sans  p-6 mb-3 mt-14 flex items-center justify-between" style={{ minHeight: 150 }}>
+                <div className="-mx-4 sm:-mx-1 bg-[#2F5383] px-4 sm:px-10 pt-5 pb-15 font-sans mb-3 mt-14 flex items-center justify-between" style={{ minHeight: 120 }}>
                     <div className="flex-1">
                         <h2 className="text-2xl font-semibold text-white mb-1">Hello! John Doe</h2>
                         <p className="text-base font-normal text-white opacity-80">We are on a mission to help customer</p>
                     </div>
                 </div>
+
                 {/* Cards Row */}
-                <div className="relative -mt-10 z-10 px-8 mb-2">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6">
+                <div className="relative -mt-10 z-10 px-2 sm:px-4 md:px-8 mb-2">
+                    {/* Mobile: vertical, fixed width; Desktop: grid */}
+                    <div className="flex flex-col items-center gap-5 md:grid md:grid-cols-3 lg:grid-cols-5 md:gap-6">
                         {statCards.map((card, i) =>
                             <StatCard key={i} title={card.title} value={card.value} icon={card.icon} />
                         )}
                     </div>
                 </div>
                 {/* Main Grid */}
-                <div className="px-8 pb-6 flex-1">
+                <div className="px-2 sm:px-4 md:px-8 pb-6 flex-1">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Order Status Pie */}
                         <div className="bg-white rounded-xl shadow p-5">
@@ -250,7 +248,7 @@ export default function Dashboard() {
                             </div>
                         </div>
                         {/* Reviews */}
-                        <div className="bg-white rounded-2xl shadow p-6 flex flex-col min-w-[320px] max-w-[500px] border border-[#F1F1F1]">
+                        <div className="bg-white rounded-2xl shadow p-6 flex flex-col min-w-[220px] sm:min-w-[320px] max-w-full border border-[#F1F1F1]">
                             <div className="flex items-center justify-between mb-2">
                                 <h4 className="font-semibold text-lg">Reviews</h4>
                                 <button className="rounded-full p-1 hover:bg-gray-100">
@@ -343,16 +341,17 @@ export default function Dashboard() {
 
 // Stat Card
 function StatCard({ title, value, icon }) {
-    // Square aspect ratio, visually matches image
+    // Mobile: fixed width, centered; Desktop: square aspect and grid
     return (
-        <div className="bg-white rounded-xl shadow flex flex-col items-center justify-center p-6 min-h-[140px] min-w-[140px] max-w-[200px] border border-gray-100"
+        <div
+            className="bg-white rounded-xl shadow flex flex-col items-center justify-center p-4 sm:p-6 min-h-[110px] border border-gray-100 w-[90vw] max-w-xs md:min-w-[140px] md:max-w-[200px]"
             style={{
                 aspectRatio: '1 / 1',
                 boxShadow: '0 2px 12px 0 rgba(44,62,80,.04)'
             }}>
             <div className="mb-2">{icon}</div>
-            <h4 className="text-lg font-semibold mb-1 text-gray-700">{title}</h4>
-            <p className="text-2xl font-bold text-gray-900">{value}</p>
+            <h4 className="text-sm sm:text-lg font-semibold mb-1 text-gray-700 text-center">{title}</h4>
+            <p className="text-xl sm:text-2xl font-bold text-gray-900">{value}</p>
         </div>
     );
 }

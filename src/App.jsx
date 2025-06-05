@@ -17,6 +17,8 @@ import EditDeliveryBoyInfo from './pages/Editdeliveryboyinfo';
 import AddDeliveryBoy from './pages/AddDevliveryBoy';
 import AddBranch from './pages/AddBranch';
 import BranchProductDetailsPage from './pages/BranchProducts';
+import EditCustomer from './pages/EditCustomer';
+import EditBranch from './pages/EditBranch';
 
 function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -88,16 +90,18 @@ function AppContent() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/customers" element={<CustomerList />} />
-            <Route path='/viewdetails' element={<ViewCustomerInfo />} />
+            <Route path='/viewdetails/:id' element={<ViewCustomerInfo />} />
             <Route path='/deliveryboys' element={<DeliveryBoyList />} />
-            <Route path='/deliveryboyinfo' element={<ViewDeliveryBoyInfo />} />
-            <Route path='/editdeliveryboy' element={<EditDeliveryBoyInfo />} />
+            <Route path='/deliveryboyinfo/:runnerId' element={<ViewDeliveryBoyInfo />} />
+            <Route path='/editcustomers/:id'element={<EditCustomer />} />
+            <Route path='/editdeliveryboy/:id' element={<EditDeliveryBoyInfo />} />
             <Route path='/adddeliveryboy' element={<AddDeliveryBoy />} />
             <Route path='/branchdeliveryboytable' element={<BranchDeliveryBoyTable />} />
-            <Route path='/branchproduct' element={<BranchProductDetailsPage />} />
+            <Route path='/branchproduct/:sellerId' element={<BranchProductDetailsPage />} />
             <Route path='/addbranch' element={<AddBranch />} />
-            <Route path='/view-branch-info' element={<BranchInfo />} />
+            <Route path='/view-branch-info/:sellerId' element={<BranchInfo />} />
             <Route path='/branches' element={<BranchList />} />
+            <Route path='/editbranch/:sellerId' element={<EditBranch />} />
             {/* Add more routes here */}
           </Routes>
         </div>
