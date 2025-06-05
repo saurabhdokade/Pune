@@ -12,7 +12,7 @@ import DeliveryBoyList from './pages/DeliveryboyList';
 import BranchDeliveryBoyTable from './pages/BranchDeliveryBoyTable';
 import BranchInfo from './pages/BranchInfo';
 import ViewDeliveryBoyInfo from './pages/ViewDeliveryBoyInfo';
-import EditDeliveryBoyInfo from './pages/Editdeliveryboyinfo';
+import EditDeliveryBoyInfo from './pages/EditDeliveryBoyInfo';
 import AddDeliveryBoy from './pages/AddDevliveryBoy';
 import AddBranch from './pages/AddBranch';
 import BranchProductDetailsPage from './pages/BranchProducts';
