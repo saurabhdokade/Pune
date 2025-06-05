@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
     PieChart, Pie, Cell,
     AreaChart, Area,
@@ -8,27 +9,13 @@ import { Star, RefreshCw } from "lucide-react";
 import pendingIcon from '../assets/b11069a4de6e255d90b4a00989a3ea8f73271f4c.png';
 import userIcon from '../assets/1be661da7ec47814f43f5782f152a0db7d07ce14.png';
 
-// DATA
-const pieData = [
-    { name: "Success Order", value: 60, color: "#23C16B" },
-    { name: "Pending Order", value: 25, color: "#FFC107" },
-    { name: "Failed Order", value: 15, color: "#F44336" },
-];
-const lineData = [
-    { name: "Week 1", customers: 400, orders: 240, delivery: 240, new: 240, returning: 120 },
-    { name: "Week 2", customers: 300, orders: 139, delivery: 221, new: 160, returning: 100 },
-    { name: "Week 3", customers: 200, orders: 980, delivery: 229, new: 300, returning: 200 },
-    { name: "Week 4", customers: 278, orders: 390, delivery: 200, new: 400, returning: 220 },
-    { name: "Week 5", customers: 189, orders: 480, delivery: 218, new: 260, returning: 180 },
-];
-const reviews = [
-    { label: "Excellent", value: 80, color: "#23C16B" },
-    { label: "Good", value: 60, color: "#8DE18C" },
-    { label: "Avarage", value: 40, color: "#FFC107" },
-    { label: "Avg-below", value: 20, color: "#FFA726" },
-    { label: "Poor", value: 10, color: "#F44336" },
-];
-const maxReviewValue = Math.max(...reviews.map(r => r.value));
+// PieChart status colors
+const STATUS_COLORS = {
+    delivered: "#23C16B",
+    pending: "#FFC107",
+    cancelled: "#F44336",
+    processing: "#2196F3"
+};
 
 // Stat Cards Icons (SVG)
 const cardIcons = [
@@ -78,13 +65,16 @@ const cardIcons = [
         </g>
     </svg>
 ];
-const statCards = [
-    { title: "Total Customer", value: "30,0000", icon: cardIcons[0] },
-    { title: "Total Order", value: "3200", icon: cardIcons[1] },
-    { title: "Total Branch", value: "32450", icon: cardIcons[2] },
-    { title: "Total Delivery Boy", value: "120", icon: cardIcons[3] },
-    { title: "Total Revenue", value: "120", icon: cardIcons[4] }
+
+// Reviews data and max value
+const reviews = [
+    { label: "Excellent", value: 80, color: "#23C16B" },
+    { label: "Good", value: 60, color: "#8DE18C" },
+    { label: "Avarage", value: 40, color: "#FFC107" },
+    { label: "Avg-below", value: 20, color: "#FFA726" },
+    { label: "Poor", value: 10, color: "#F44336" },
 ];
+const maxReviewValue = Math.max(...reviews.map(r => r.value));
 
 // Up arrow (circle background)
 const UpArrow = ({ color = "#7C5AFF", bg = "#ECEAFF" }) => (
@@ -96,7 +86,87 @@ const UpArrow = ({ color = "#7C5AFF", bg = "#ECEAFF" }) => (
     </span>
 );
 
+// Stat Card
+function StatCard({ title, value, icon }) {
+    // Mobile: fixed width, centered; Desktop: square aspect and grid
+    return (
+        <div
+            className="bg-white rounded-xl shadow flex flex-col items-center justify-center p-4 sm:p-6 min-h-[110px] border border-gray-100 w-[90vw] max-w-xs md:min-w-[140px] md:max-w-[200px]"
+            style={{
+                aspectRatio: '1 / 1',
+                boxShadow: '0 2px 12px 0 rgba(44,62,80,.04)'
+            }}>
+            <div className="mb-2">{icon}</div>
+            <h4 className="text-sm sm:text-lg font-semibold mb-1 text-gray-700 text-center">{title}</h4>
+            <p className="text-xl sm:text-2xl font-bold text-gray-900">{value}</p>
+        </div>
+    );
+}
+
 export default function Dashboard() {
+    const [statCards, setStatCards] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [pieData, setPieData] = useState([]);
+    const [lineData, setLineData] = useState([]);
+    const [selectedYear, setSelectedYear] = useState("2025");
+    const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
+
+    useEffect(() => {
+        async function fetchDashboard() {
+            setLoading(true);
+            setError(null);
+            try {
+                const res = await axios.get(
+                    `https://api.citycentermall.com/api/v1/super-admin/dashboard?year=${selectedYear}`
+                );
+                const data = res.data;
+
+                // Stat cards data
+                const cards = [
+                    { title: "Total Customer", value: data.totalCustomers, icon: cardIcons[0] },
+                    { title: "Total Order", value: data.totalOrders, icon: cardIcons[1] },
+                    { title: "Total Branch", value: data.totalVendors, icon: cardIcons[2] },
+                    { title: "Total Delivery Boy", value: data.totalRunners, icon: cardIcons[3] },
+                    { title: "Total Revenue", value: data.totalRevenue, icon: cardIcons[4] },
+                ];
+                setStatCards(cards);
+
+                // Pie chart data with color applied
+                const pieChartData = [
+                    { name: "Delivered Orders", value: data.orderStatus.delivered, color: STATUS_COLORS.delivered },
+                    { name: "Pending Orders", value: data.orderStatus.pending, color: STATUS_COLORS.pending },
+                    { name: "Cancelled Orders", value: data.orderStatus.cancelled, color: STATUS_COLORS.cancelled },
+                    { name: "Processing Orders", value: data.orderStatus.processing, color: STATUS_COLORS.processing },
+                ];
+                setPieData(pieChartData);
+                setPendingOrdersCount(data.orderStatus.pending);
+
+                // Line chart data
+                const monthlyCounts = data.customerOverview.monthlyCounts;
+                const lineChartData = monthlyCounts.map((item, index) => ({
+                    name: item.month,
+                    customers: item.count,
+                    orders: data.orderOverview?.monthlyCounts?.[index]?.count || 0,
+                    delivery: data.runnerOverview?.monthlyCounts?.[index]?.count || 0,
+                    new: data.customerOverview?.monthlyNewCounts?.[index]?.count || 0,
+                    returning: data.customerOverview?.monthlyReturningCounts?.[index]?.count || 0,
+                }));
+                setLineData(lineChartData);
+
+                setLoading(false);
+            } catch (err) {
+                setError("Failed to load dashboard data.");
+                setLoading(false);
+            }
+        }
+
+        fetchDashboard();
+    }, [selectedYear]);
+
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>{error}</div>;
+
     return (
         <div className="min-h-screen bg-[#F6F8FB] font-sans flex flex-col">
             {/* Main Content */}
@@ -153,15 +223,30 @@ export default function Dashboard() {
                                     <p className="text-xl font-bold text-black">100%</p>
                                 </div>
                             </div>
-                            {/* Legend */}
+                            {/* Legend with matching colors */}
                             <div className="flex flex-col mt-3 space-y-1 text-sm">
-                                <div className="flex items-center gap-2"><span className="h-3 w-3 rounded-full" style={{ background: "#23C16B" }} />Success Order</div>
-                                <div className="flex items-center gap-2"><span className="h-3 w-3 rounded-full" style={{ background: "#FFC107" }} />Pending Order</div>
-                                <div className="flex items-center gap-2"><span className="h-3 w-3 rounded-full" style={{ background: "#F44336" }} />Failed Order</div>
+                                {pieData.map((item, idx) => (
+                                    <div key={idx} className="flex items-center gap-2">
+                                        <span className="h-3 w-3 rounded-full" style={{ background: item.color }} />
+                                        {item.value ?? 0} {item.name}
+                                    </div>
+                                ))}
                             </div>
                         </div>
                         {/* Area Charts */}
-                        <div className="flex flex-col gap-4">
+                        <div className="relative flex flex-col gap-4 p-4 bg-white rounded-lg shadow">
+                            <div className="absolute top-4 right-4">
+                                <select
+                                    value={selectedYear}
+                                    onChange={(e) => setSelectedYear(e.target.value)}
+                                    className="border border-gray-300 rounded-md p-1"
+                                >
+                                    <option value="2023">2023</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                </select>
+                            </div>
+
                             {/* Customer Overview */}
                             <div className="bg-white rounded-xl shadow p-4 flex-1">
                                 <div className="flex items-center gap-2 mb-1">
@@ -190,6 +275,7 @@ export default function Dashboard() {
                                     </AreaChart>
                                 </ResponsiveContainer>
                             </div>
+
                             {/* Order Overview */}
                             <div className="bg-white rounded-xl shadow p-4 flex-1">
                                 <div className="flex items-center gap-2 mb-1">
@@ -218,6 +304,7 @@ export default function Dashboard() {
                                     </AreaChart>
                                 </ResponsiveContainer>
                             </div>
+
                             {/* Delivery Boy Overview */}
                             <div className="bg-white rounded-xl shadow p-4 flex-1">
                                 <div className="flex items-center gap-2 mb-1">
@@ -321,7 +408,9 @@ export default function Dashboard() {
                                     alt="Pending Orders"
                                     className="w-12 h-12 rounded-full bg-blue-100 p-2"
                                 />
-                                <p className="text-base font-medium">You Have 4 pending orders</p>
+                                <p className="text-base font-medium">
+                                    You have {pendingOrdersCount} pending {pendingOrdersCount === 1 ? "order" : "orders"}
+                                </p>
                             </div>
                             <div className="flex items-center space-x-3">
                                 <img
@@ -329,29 +418,12 @@ export default function Dashboard() {
                                     alt="New User"
                                     className="w-12 h-12 rounded-full bg-orange-100 p-2"
                                 />
-                                <p className="text-base font-medium">new user registered</p>
+                                <p className="text-base font-medium">New user registered</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    );
-}
-
-// Stat Card
-function StatCard({ title, value, icon }) {
-    // Mobile: fixed width, centered; Desktop: square aspect and grid
-    return (
-        <div
-            className="bg-white rounded-xl shadow flex flex-col items-center justify-center p-4 sm:p-6 min-h-[110px] border border-gray-100 w-[90vw] max-w-xs md:min-w-[140px] md:max-w-[200px]"
-            style={{
-                aspectRatio: '1 / 1',
-                boxShadow: '0 2px 12px 0 rgba(44,62,80,.04)'
-            }}>
-            <div className="mb-2">{icon}</div>
-            <h4 className="text-sm sm:text-lg font-semibold mb-1 text-gray-700 text-center">{title}</h4>
-            <p className="text-xl sm:text-2xl font-bold text-gray-900">{value}</p>
         </div>
     );
 }

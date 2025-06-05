@@ -110,6 +110,30 @@ const DriverList = () => {
     if (page < totalPages) setPage(page + 1);
   };
 
+  // MOBILE CARD EXPANDED DETAILS
+  const renderMobileDetails = (driver) => {
+    const info = expandedDriver[driver._id.$oid];
+    if (info === undefined) return <span className="text-gray-400">Loading...</span>;
+    if (info === null) return <span className="text-red-500">Failed to load details.</span>;
+    return (
+      <div className="mt-2 mb-2">
+        <div className="grid grid-cols-1 gap-1 text-[15px]">
+          <span><b>Email:</b> {info.email || "-"}</span>
+          <span><b>Contact:</b> {info.contact_no || "-"}</span>
+          <span><b>Address:</b> {info.address || "-"}</span>
+          <span><b>City:</b> {info.city || "-"}</span>
+          <span><b>State:</b> {info.state || "-"}</span>
+          <span><b>Pin Code:</b> {info.pin_code || "-"}</span>
+          <span><b>Vehicle ID:</b> {info.vehicleId?.$oid || "-"}</span>
+          <span><b>Bank Details ID:</b> {info.bankDetailsId?.$oid || "-"}</span>
+          <span><b>Location:</b> {info.current_location?.coordinates?.join(", ") || "-"}</span>
+          <span><b>Created At:</b> {info.createdAt?.$date ? new Date(info.createdAt.$date).toLocaleString() : "-"}</span>
+          <span><b>Updated At:</b> {info.updatedAt?.$date ? new Date(info.updatedAt.$date).toLocaleString() : "-"}</span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-[#F6F8FB] p-4 font-sans p-6 mb-4 mt-14">
       <ToastContainer position="top-right" autoClose={2000} />
@@ -147,7 +171,8 @@ const DriverList = () => {
           </button>
         </div>
 
-        <div className="rounded-xll shadow bg-white border rounded-tl-xll">
+        {/* Desktop Table */}
+        <div className="rounded-xll shadow bg-white border rounded-tl-xll hidden md:block">
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm text-gray-800 table-auto rounded-tl-xll">
               <thead>
@@ -263,6 +288,81 @@ const DriverList = () => {
               </tbody>
             </table>
           </div>
+        </div>
+        {/* MOBILE CARD LIST */}
+        <div className="md:hidden">
+          {pagedFiltered.length === 0 && (
+            <div className="py-6 text-center text-gray-400">No drivers found.</div>
+          )}
+          {pagedFiltered.map((d, i) => (
+            <div
+              key={d._id?.$oid}
+              className="bg-white rounded-xl mb-4 shadow border border-pink-100 p-4 flex flex-col gap-2"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent((d.firstName || "") + " " + (d.lastName || ""))}&background=EB627D&color=fff`}
+                    alt={d.firstName}
+                    className="w-12 h-12 rounded-full border border-gray-200 object-cover"
+                  />
+                  <div>
+                    <span className="block font-semibold text-gray-900 text-base">
+                      {(d.firstName || "") + " " + (d.lastName || "")}
+                    </span>
+                    <span className="block text-xs text-gray-500">
+                      #{String((page - 1) * PAGE_SIZE + i + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex gap-2 text-xl text-[#EB627D]">
+                  <button
+                    className="cursor-pointer"
+                    title="View"
+                    onClick={() => toggleExpand(d._id.$oid)}
+                  >
+                    <FaEye />
+                  </button>
+                  <button
+                    title="Edit"
+                    className="cursor-pointer"
+                    onClick={() => navigate(`/editdeliveryboy/${d._id.$oid}`)}
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    title="Delete"
+                    className="cursor-pointer"
+                    onClick={() => handleDelete(d._id.$oid)}
+                    disabled={deletingId === d._id.$oid}
+                  >
+                    {deletingId === d._id.$oid ? (
+                      <span className="animate-spin">⏳</span>
+                    ) : (
+                      <FaTrash />
+                    )}
+                  </button>
+                </div>
+              </div>
+              <div className="text-gray-700 text-sm mt-2">
+                <div>
+                  <b>Email:</b> {d.email || "-"}
+                </div>
+                <div>
+                  <b>Contact No.:</b> {d.contact_no || "-"}
+                </div>
+                <div>
+                  <b>City:</b> {d.city || "-"}
+                </div>
+              </div>
+              {/* Expandable details */}
+              {expandedId === d._id.$oid && (
+                <div className="bg-pink-50 rounded-lg p-3 mt-2 border border-pink-200">
+                  {renderMobileDetails(d)}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
         {/* Pagination Footer */}
         <div className="flex flex-col md:flex-row md:justify-between items-center p-4">

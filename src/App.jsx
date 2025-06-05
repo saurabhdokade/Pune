@@ -19,6 +19,7 @@ import BranchProductDetailsPage from './pages/BranchProducts';
 import EditCustomer from './pages/EditCustomer';
 import EditBranch from './pages/EditBranch';
 import BranchList from './pages/BranchList';
+import OrderList from './pages/OrderList';
 
 function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -102,6 +103,7 @@ function AppContent() {
             <Route path='/view-branch-info/:sellerId' element={<BranchInfo />} />
             <Route path='/branchlist' element={<BranchList />} />
             <Route path='/editbranch/:sellerId' element={<EditBranch />} />
+            <Route path='/orders' element={<OrderList />} />
             {/* Add more routes here */}
           </Routes>
         </div>
