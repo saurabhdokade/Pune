@@ -11,7 +11,6 @@ import ViewCustomerInfo from './pages/ViewCustomerDetails';
 import DeliveryBoyList from './pages/DeliveryboyList';
 import BranchDeliveryBoyTable from './pages/BranchDeliveryBoyTable';
 import BranchInfo from './pages/BranchInfo';
-import BranchList from './pages/Branchlist';
 import ViewDeliveryBoyInfo from './pages/ViewDeliveryBoyInfo';
 import EditDeliveryBoyInfo from './pages/Editdeliveryboyinfo';
 import AddDeliveryBoy from './pages/AddDevliveryBoy';
@@ -19,6 +18,7 @@ import AddBranch from './pages/AddBranch';
 import BranchProductDetailsPage from './pages/BranchProducts';
 import EditCustomer from './pages/EditCustomer';
 import EditBranch from './pages/EditBranch';
+import BranchList from './pages/BranchList';
 
 function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
