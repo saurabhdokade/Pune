@@ -103,7 +103,7 @@ const BranchList = () => {
             </label>
             <button
               onClick={handleRedirect}
-              className="bg-[#EB627D] hover:bg-[#d9506d] text-white font-medium rounded-md px-8 py-2 text-base"
+              className="bg-[#EB627D] cursor-pointer hover:bg-[#d9506d] text-white font-medium rounded-md px-8 py-2 text-base"
             >
               + Add
             </button>
