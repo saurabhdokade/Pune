@@ -43,7 +43,11 @@ export default function Login() {
         toast.error(res.data.message || "Mobile number is not registered, please signup");
       } else {
         setStep(2);
+         if (res.data.otp) {
+        toast.success(`OTP sent successfully! Your OTP is ${res.data.otp}`);
+      } else {
         toast.success("OTP sent successfully!");
+      }
       }
     } catch (err) {
       const errorMsg =
