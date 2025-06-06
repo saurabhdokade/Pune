@@ -215,7 +215,7 @@ const DriverList = () => {
                       </td>
                       <td className="py-3 px-6 align-middle">{d.email}</td>
                       <td className="py-3 px-6 align-middle">{d.contact_no}</td>
-                      <td className="py-3 px-6 align-middle">{d.city}</td>
+                      <td className="py-3 px-6 align-middle">{d.address}</td>
                       <td className="py-3 px-6 align-middle">
                         <div className="flex gap-3 text-[#EB627D] text-lg">
                           <button
@@ -223,6 +223,7 @@ const DriverList = () => {
                             title="View"
                             onClick={() => toggleExpand(d._id.$oid)}
                           >
+                            
                             <FaEye />
                           </button>
                           <button
@@ -352,7 +353,7 @@ const DriverList = () => {
                   <b>Contact No.:</b> {d.contact_no || "-"}
                 </div>
                 <div>
-                  <b>City:</b> {d.city || "-"}
+                  <b>City:</b> {d.address || "-"}
                 </div>
               </div>
               {/* Expandable details */}

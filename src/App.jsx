@@ -1,11 +1,11 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
-import { AuthProvider } from './components/AuthContext';
+import { AuthProvider, useAuth } from './components/AuthContext';
 import CustomerList from './pages/CustomerList';
 import ViewCustomerInfo from './pages/ViewCustomerDetails';
 import DeliveryBoyList from './pages/DeliveryboyList';
@@ -20,6 +20,17 @@ import EditCustomer from './pages/EditCustomer';
 import EditBranch from './pages/EditBranch';
 import BranchList from './pages/BranchList';
 import OrderList from './pages/OrderList';
+import OrderDetails from './pages/ViewOrderDetails';
+
+// Protected route wrapper
+function ProtectedRoute({ children }) {
+  const { isAuthenticated } = useAuth();
+  // You may also want to check for token expiration here
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
 
 function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -87,24 +98,94 @@ function AppContent() {
         )}
         <div className="flex-1 p-1 overflow-y-auto bg-gray min-h-screen">
           <Routes>
+            {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/customers" element={<CustomerList />} />
-            <Route path='/viewdetails/:id' element={<ViewCustomerInfo />} />
-            <Route path='/deliveryboys' element={<DeliveryBoyList />} />
-            <Route path='/deliveryboyinfo/:runnerId' element={<ViewDeliveryBoyInfo />} />
-            <Route path='/editcustomers/:id'element={<EditCustomer />} />
-            <Route path='/editdeliveryboy/:id' element={<EditDeliveryBoyInfo />} />
-            <Route path='/adddeliveryboy' element={<AddDeliveryBoy />} />
-            <Route path='/branchdeliveryboytable' element={<BranchDeliveryBoyTable />} />
-            <Route path='/branchproduct/:sellerId' element={<BranchProductDetailsPage />} />
-            <Route path='/addbranch' element={<AddBranch />} />
-            <Route path='/view-branch-info/:sellerId' element={<BranchInfo />} />
-            <Route path='/branchlist' element={<BranchList />} />
-            <Route path='/editbranch/:sellerId' element={<EditBranch />} />
-            <Route path='/orders' element={<OrderList />} />
-            {/* Add more routes here */}
+
+            {/* Protected Routes */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/customers" element={
+              <ProtectedRoute>
+                <CustomerList />
+              </ProtectedRoute>
+            } />
+            <Route path='/viewdetails/:id' element={
+              <ProtectedRoute>
+                <ViewCustomerInfo />
+              </ProtectedRoute>
+            } />
+            <Route path='/deliveryboys' element={
+              <ProtectedRoute>
+                <DeliveryBoyList />
+              </ProtectedRoute>
+            } />
+            <Route path='/deliveryboyinfo/:runnerId' element={
+              <ProtectedRoute>
+                <ViewDeliveryBoyInfo />
+              </ProtectedRoute>
+            } />
+            <Route path='/editcustomers/:id' element={
+              <ProtectedRoute>
+                <EditCustomer />
+              </ProtectedRoute>
+            } />
+            <Route path='/editdeliveryboy/:id' element={
+              <ProtectedRoute>
+                <EditDeliveryBoyInfo />
+              </ProtectedRoute>
+            } />
+            <Route path='/adddeliveryboy' element={
+              <ProtectedRoute>
+                <AddDeliveryBoy />
+              </ProtectedRoute>
+            } />
+            <Route path='/branchdeliveryboytable' element={
+              <ProtectedRoute>
+                <BranchDeliveryBoyTable />
+              </ProtectedRoute>
+            } />
+            <Route path='/branchproduct/:sellerId' element={
+              <ProtectedRoute>
+                <BranchProductDetailsPage />
+              </ProtectedRoute>
+            } />
+            <Route path='/addbranch' element={
+              <ProtectedRoute>
+                <AddBranch />
+              </ProtectedRoute>
+            } />
+            <Route path='/view-branch-info/:sellerId' element={
+              <ProtectedRoute>
+                <BranchInfo />
+              </ProtectedRoute>
+            } />
+            <Route path='/branchlist' element={
+              <ProtectedRoute>
+                <BranchList />
+              </ProtectedRoute>
+            } />
+            <Route path='/editbranch/:sellerId' element={
+              <ProtectedRoute>
+                <EditBranch />
+              </ProtectedRoute>
+            } />
+            <Route path='/orders' element={
+              <ProtectedRoute>
+                <OrderList />
+              </ProtectedRoute>
+            } />
+            <Route path='/vieworderdetails/:orderId' element={
+              <ProtectedRoute>
+                <OrderDetails />
+              </ProtectedRoute>
+            } />
+            {/* Add more protected routes here */}
+            {/* Optional: Catch-all route */}
+            {/* <Route path="*" element={<Navigate to="/dashboard" />} /> */}
           </Routes>
         </div>
       </div>

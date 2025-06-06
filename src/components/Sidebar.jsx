@@ -113,8 +113,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       <div
         className="absolute bottom-4 left-4 flex items-center space-x-2 text-white hover:text-gray-300 cursor-pointer"
         onClick={() => {
-          // Implement logout logic here (e.g., clearing tokens, redirecting to login)
-          console.log("Logging out...");
+          // Clear token and redirect to login
+          localStorage.removeItem("access_token"); 
           navigate("/login");
         }}
       >

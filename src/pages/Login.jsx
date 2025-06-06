@@ -2,30 +2,63 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash, FaFacebookF, FaGoogle, FaApple } from "react-icons/fa";
 import Logo from "../components/Logo";
-import secureLoginImg from "../assets/f031e5b1caa0632b7cb3d2dc29294fc91b0a771f.png"; // Update as needed
- 
+import axios from "axios";
+import secureLoginImg from "../assets/f031e5b1caa0632b7cb3d2dc29294fc91b0a771f.png";
+import { useAuth } from "../components/AuthContext"; // <-- Import useAuth
+
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
- 
+  const { login } = useAuth(); // <-- Use the login method from AuthContext
+
+  // Default values (from your example)
   const [formData, setFormData] = useState({
-    email: "john.doe@gmail.com",
-    password: "••••••••••••••",
+    username: "john_doe_admin",
+    email: "john.doe@example.com"
   });
- 
+
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
+
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.id]: e.target.value,
     }));
   };
- 
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your authentication logic here!
-    navigate("/dashboard");
+    setApiError("");
+    setLoading(true);
+    try {
+      // API expects: { username, email }
+      const response = await axios.post(
+        "https://api.citycentermall.com/api/v1/super-admin/signin",
+        {
+          username: formData.username,
+          email: formData.email,
+        }
+      );
+      // Handle successful login (access_token, etc.)
+      if (response.data && response.data.access_token) {
+        // Use AuthContext's login function, not just localStorage
+        login(response.data.access_token, { username: formData.username, email: formData.email });
+        navigate("/dashboard");
+      } else {
+        setApiError("No access token received. Please try again.");
+      }
+    } catch (error) {
+      setApiError(
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        "Invalid credentials"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
- 
+
   return (
     <div className="min-h-screen w-full bg-[#FAFAFA] flex flex-col justify-center items-center">
       <div className="w-full max-w-[1200px] mx-auto min-h-screen flex items-center px-2 py-8">
@@ -42,13 +75,27 @@ export default function Login() {
           {/* Login Heading */}
           <h2 className="text-4xl font-semibold text-[#222] mb-3">Login</h2>
           <p className="text-[#5b5b5b] text-base mb-7">
-            Login to access your travelwise&nbsp;<span className="font-medium">account</span>
+            Login to access your admin&nbsp;<span className="font-medium">account</span>
           </p>
           <form
             className="w-full max-w-[430px] flex flex-col gap-5"
             onSubmit={handleSubmit}
             autoComplete="off"
           >
+            <div>
+              <label className="block text-sm font-medium mb-1" htmlFor="username">
+                Username
+              </label>
+              <input
+                className="w-full border border-[#bcbcbc] rounded-md px-3 py-2 font-medium focus:outline-none focus:border-[#264283] text-base"
+                type="text"
+                id="username"
+                value={formData.username}
+                onChange={handleChange}
+                autoComplete="username"
+                required
+              />
+            </div>
             <div>
               <label className="block text-sm font-medium mb-1" htmlFor="email">
                 Email
@@ -59,44 +106,20 @@ export default function Login() {
                 id="email"
                 value={formData.email}
                 onChange={handleChange}
-                autoComplete="username"
+                autoComplete="email"
+                required
               />
             </div>
-            <div className="relative">
-              <label className="block text-sm font-medium mb-1" htmlFor="password">
-                Password
-              </label>
-              <input
-                className="w-full border border-[#bcbcbc] rounded-md px-3 py-2 font-medium focus:outline-none focus:border-[#264283] text-base pr-10"
-                type={showPassword ? "text" : "password"}
-                id="password"
-                value={formData.password}
-                onChange={handleChange}
-                autoComplete="current-password"
-              />
-              <button
-                type="button"
-                tabIndex={-1}
-                className="absolute top-8 right-3 text-[#757575]"
-                onClick={() => setShowPassword((s) => !s)}
-              >
-                {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
-              </button>
-            </div>
-            <div className="flex items-center justify-between">
-              <label className="flex items-center text-sm font-medium text-[#222]">
-                <input type="checkbox" className="accent-[#264283] w-4 h-4 mr-2" />
-                Remember me
-              </label>
-              <a href="#" className="text-xs text-[#FF3B3B] font-medium hover:underline">
-                Forgot Password
-              </a>
-            </div>
+            {/* API error message */}
+            {apiError && (
+              <div className="text-red-500 text-sm">{apiError}</div>
+            )}
             <button
               type="submit"
-              className="w-full bg-[#264283] text-white font-semibold text-lg rounded-md py-2.5 hover:bg-[#1f3662] transition"
+              className={`w-full bg-[#264283] text-white font-semibold text-lg rounded-md py-2.5 hover:bg-[#1f3662] transition ${loading ? "opacity-60 cursor-not-allowed" : ""}`}
+              disabled={loading}
             >
-              Login
+              {loading ? "Logging in..." : "Login"}
             </button>
             <div className="text-center text-sm">
               <span className="text-[#222]">Don’t have an account? </span>
@@ -135,8 +158,6 @@ export default function Login() {
             <div className="hidden md:flex flex-1 justify-center items-center w-full md:w-1/2 mb-8 md:mb-0">
               <div className="bg-white rounded-2xl flex items-center justify-center w-[420px] h-[650px] relative shadow-none"
                 style={{
-                  // Border removed as per your request
-                  // boxShadow: "0 0 0 1.5px #2196F3",
                   padding: 0
                 }}
               >
