@@ -39,6 +39,7 @@ function AppContent() {
   // Hide sidebar/navbar for auth routes
   const hideSidebarAndNavbar = [
     '/login',
+    '/login/',
     '/signup',
     '/addstore',
     '/register',

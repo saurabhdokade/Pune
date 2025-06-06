@@ -214,7 +214,7 @@ const OrderList = () => {
                       </td>
                       <td className="py-3 px-4 text-center">
                         <button
-                          className="text-pink-500"
+                          className="text-pink-500 cursor-pointer"
                           title="View Details"
                           onClick={() => handleViewDetails(order.id)}
                         >
