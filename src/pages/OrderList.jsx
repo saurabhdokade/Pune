@@ -51,7 +51,6 @@ const OrderList = () => {
 
   const navigate = useNavigate();
 
-  // Fetch orders on mount
   useEffect(() => {
     setLoading(true);
     axios
@@ -90,7 +89,7 @@ const OrderList = () => {
   // Search and sort
   const filtered = normalizedOrders
     .filter((order) =>
-      order.id.toLowerCase().includes(search.toLowerCase())
+      order.id && order.id.toLowerCase().includes(search.toLowerCase())
     )
     .sort((a, b) =>
       sortAsc
@@ -117,7 +116,6 @@ const OrderList = () => {
 
   // Handle view order details
   const handleViewDetails = (orderId) => {
-    // Navigate to the order details page with orderId as a param
     navigate(`/vieworderdetails/${orderId}`);
   };
 
