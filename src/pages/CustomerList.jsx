@@ -213,7 +213,7 @@ const CustomerList = () => {
                         className="ml-1 text-white"
                         aria-label="Sort Name"
                       >
-                        <span className="inline-block align-middle">↑↓</span>
+                        {/* <span className="inline-block align-middle">↑↓</span> */}
                       </button>
                     </th>
                     <th className="font-semibold py-3 px-4">Email</th>
@@ -234,11 +234,11 @@ const CustomerList = () => {
                         {String((page - 1) * PAGE_SIZE + i + 1).padStart(2, "0")}
                       </td>
                       <td className="py-3 px-4 flex items-center gap-3 font-medium">
-                        <img
+                        {/* <img
                           src={`https://randomuser.me/api/portraits/men/${((page - 1) * PAGE_SIZE + i) % 5 + 1}.jpg`}
                           alt={c.name || "User"}
                           className="w-10 h-10 rounded-full object-cover border border-gray-200"
-                        />
+                        /> */}
                         {c.name || "-"}
                       </td>
                       <td className="py-3 px-4 text-center">{c.email || "-"}</td>
