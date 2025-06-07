@@ -9,6 +9,7 @@ import { Star, RefreshCw } from "lucide-react";
 import pendingIcon from '../assets/b11069a4de6e255d90b4a00989a3ea8f73271f4c.png';
 import userIcon from '../assets/1be661da7ec47814f43f5782f152a0db7d07ce14.png';
 import { useAuth } from "../components/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 // Helper to decode JWT token
 function decodeJWT(token) {
@@ -120,6 +121,8 @@ function StatCard({ title, value, icon }) {
 }
 
 export default function Dashboard() {
+    const navigate = useNavigate();
+
     const [statCards, setStatCards] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -531,9 +534,11 @@ export default function Dashboard() {
                                 <img
                                     src={userIcon}
                                     alt="New User"
-                                    className="w-12 h-12 rounded-full bg-orange-100 p-2"
+                                    onClick={() => navigate(`/addbranch`)}
+
+                                    className="w-12 h-12 cursor-pointer rounded-full bg-orange-100 p-2"
                                 />
-                                <p className="text-base font-medium">New user registered</p>
+                                <p className="text-base font-medium">New vendor registered</p>
                             </div>
                         </div>
                     </div>

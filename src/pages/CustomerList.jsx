@@ -143,10 +143,10 @@ const CustomerList = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F6F8FB] p-4 font-sans p-6 mb-4 mt-14">
+    <div className="min-h-screen w-full bg-[#F6F8FB] p-4 font-sans mb-4 mt-14 relative">
       <ToastContainer position="top-right" autoClose={2000} />
       <Navbar />
-      <div className="max-w-6xl mx-auto w-full">
+      {/* <div className="max-w-6xl mx-auto w-full"> */}
         {/* Top Controls */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-8 mt-6">
           <h2 className="text-pink-600 font-semibold text-xl md:text-2xl">
@@ -385,7 +385,7 @@ const CustomerList = () => {
             </button>
           </div>
         </div>
-      </div>
+      {/* </div> */}
     </div>
   );
 };

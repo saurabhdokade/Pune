@@ -2,38 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import { useAuth } from "../components/AuthContext"; // Import your auth context
-
-// Dummy delivery boys
-const deliveryBoys = [
-  {
-    userId: "UK_RIDER",
-    name: "Kamal Verma",
-    email: "example@gmail.com",
-    phone: "+919876543210",
-    address: "4517 Washington Ave. Manchester, Kentucky 39495",
-  },
-  {
-    userId: "B,_Kumar",
-    name: "Bijak Kumar",
-    email: "example@gmail.com",
-    phone: "+919876543210",
-    address: "2118 Thornridge Cir. Syracuse, Connecticut 35624",
-  },
-  {
-    userId: "Akash_s",
-    name: "Akash Sharma",
-    email: "example@gmail.com",
-    phone: "+919876543210",
-    address: "6391 Elgin St. Celina, Delaware 10299",
-  },
-];
+import { useAuth } from "../components/AuthContext";
+import { FaEye } from "react-icons/fa";
 
 export default function BranchInfo() {
   const { sellerId } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuth(); // <-- Get token from context
-  const storedToken = token || localStorage.getItem("access_token"); // Fallback to localStorage
+  const { token } = useAuth();
+  const storedToken = token || localStorage.getItem("access_token");
 
   const [sellerInfo, setSellerInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -41,7 +17,31 @@ export default function BranchInfo() {
   const [branchProducts, setBranchProducts] = useState([]);
   const [productError, setProductError] = useState("");
 
-  // Fetch seller info and products
+  // Dummy delivery boys (replace with API data if available)
+  const deliveryBoys = [
+    {
+      userId: "UK_RIDER",
+      name: "Kamal Verma",
+      email: "example@gmail.com",
+      phone: "+919876543210",
+      address: "4517 Washington Ave. Manchester, Kentucky 39495",
+    },
+    {
+      userId: "B,_Kumar",
+      name: "Bijak Kumar",
+      email: "example@gmail.com",
+      phone: "+919876543210",
+      address: "2118 Thornridge Cir. Syracuse, Connecticut 35624",
+    },
+    {
+      userId: "Akash_s",
+      name: "Akash Sharma",
+      email: "example@gmail.com",
+      phone: "+919876543210",
+      address: "6391 Elgin St. Celina, Delaware 10299",
+    },
+  ];
+
   useEffect(() => {
     async function fetchSeller() {
       setLoading(true);
@@ -51,19 +51,19 @@ export default function BranchInfo() {
         const res = await axios.get(
           `https://api.citycentermall.com/api/v1/super-admin/getsellerinfo/${sellerId}`,
           {
-            headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {}
+            headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {},
           }
         );
         const info = res.data?.data || null;
         setSellerInfo(info);
 
-        // Map products from API, or show product not found if none
+        // Products mapping
         const products =
           info?.store?.products && info.store.products.length > 0
             ? info.store.products.map((p, i) => ({
                 id: p.id || `P${i + 1}`,
                 code: p.id ? p.id.slice(-6).toUpperCase() : `P${i + 1}`,
-                brand: "Brand",
+                brand: (p.brand && p.brand.brand_name) || "N/A",
                 name: p.name || "N/A",
                 size: "N/A",
                 qty: p.product_stock ?? 0,
@@ -73,6 +73,7 @@ export default function BranchInfo() {
                 offer_title: p.offer_title || "N/A",
                 discount: p.discount || 0,
                 image: Array.isArray(p.product_images) ? p.product_images[0] : "",
+                status: p.status || "N/A",
               }))
             : [];
         setBranchProducts(products);
@@ -96,19 +97,23 @@ export default function BranchInfo() {
 
   // Handler for vendor dashboard navigation
   const handleVendorDashboard = () => {
-    // Replace '/vendordashboard' with your vendor dashboard route, and pass the sellerId in the URL
     navigate(`/vendordashboard/${sellerId}`);
   };
 
+  // Handler for viewing product details
+  const handleProductDetails = (productId) => {
+    navigate(`/productdetails/${productId}`);
+  };
+
   return (
-    <div className="min-h-screen bg-[#F6F8FB] p-4 font-sans  p-6 mb-4 mt-16">
+    <div className="min-h-screen bg-[#F6F8FB] p-4 font-sans p-6 mb-4 mt-16">
       <Navbar />
       <div className="flex justify-end mb-4">
         <button
           className="bg-[#EB627D] cursor-pointer hover:bg-[#d9506d] text-white font-medium rounded-md px-6 py-2 text-base"
           onClick={handleVendorDashboard}
         >
-         View More Info-(Dashboard)
+          View More Info-(Dashboard)
         </button>
       </div>
       <h2 className="text-center text-2xl font-semibold text-[#F25C7A] mb-8 border-b-2 border-b-gray-100 pb-2 tracking-wide">
@@ -269,6 +274,7 @@ export default function BranchInfo() {
                   <thead>
                     <tr className="bg-[#F25C7A] text-white">
                       <th className="px-4 py-3 font-semibold text-left">Sr.No</th>
+                      <th className="px-4 py-3 font-semibold text-left">Product Image</th>
                       <th className="px-4 py-3 font-semibold text-left">Product Code</th>
                       <th className="px-4 py-3 font-semibold text-left">Brand</th>
                       <th className="px-4 py-3 font-semibold text-left">Product Name</th>
@@ -277,12 +283,25 @@ export default function BranchInfo() {
                       <th className="px-4 py-3 font-semibold text-left">Price</th>
                       <th className="px-4 py-3 font-semibold text-left">Offer Title</th>
                       <th className="px-4 py-3 font-semibold text-left">Discount</th>
+                      <th className="px-4 py-3 font-semibold text-left">Status</th>
+                      <th className="px-4 py-3 font-semibold text-left">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {branchProducts.map((row, i) => (
                       <tr key={row.code || row.id || i} className={i % 2 === 0 ? "bg-white" : "bg-pink-50"}>
                         <td className="px-4 py-3">{i + 1}</td>
+                        <td className="px-4 py-3">
+                          {row.image ? (
+                            <img
+                              src={row.image}
+                              alt={row.name}
+                              className="w-14 h-14 object-contain rounded "
+                            />
+                          ) : (
+                            <span className="text-gray-400">N/A</span>
+                          )}
+                        </td>
                         <td className="px-4 py-3">{row.code}</td>
                         <td className="px-4 py-3">{row.brand}</td>
                         <td className="px-4 py-3">{row.name}</td>
@@ -295,6 +314,16 @@ export default function BranchInfo() {
                         <td className="px-4 py-3">{row.price}</td>
                         <td className="px-4 py-3">{row.offer_title}</td>
                         <td className="px-4 py-3">{row.discount}</td>
+                        <td className="px-4 py-3">{row.status}</td>
+                        <td className="px-4 py-3">
+                          <button
+                            onClick={() => handleProductDetails(row.id)}
+                            className="text-[#F25C7A] hover:text-pink-800 transition"
+                            title="View Product Details"
+                          >
+                            <FaEye className="inline-block text-lg" />
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -318,6 +347,17 @@ export default function BranchInfo() {
                     </div>
                     <div className="px-4 pb-2 text-gray-700">
                       <div>
+                        {row.image ? (
+                          <img
+                            src={row.image}
+                            alt={row.name}
+                            className="w-16 h-16 object-contain rounded border mb-2"
+                          />
+                        ) : (
+                          <span className="text-gray-400">No Image</span>
+                        )}
+                      </div>
+                      <div>
                         <span className="font-semibold">Brand: </span>
                         {row.brand}
                       </div>
@@ -340,6 +380,19 @@ export default function BranchInfo() {
                       <div>
                         <span className="font-semibold">Discount: </span>
                         {row.discount}
+                      </div>
+                      <div>
+                        <span className="font-semibold">Status: </span>
+                        {row.status}
+                      </div>
+                      <div className="flex items-center mt-2">
+                        <button
+                          onClick={() => handleProductDetails(row.id)}
+                          className="text-[#F25C7A] cursor-pointer hover:text-pink-800 transition"
+                          title="View Product Details"
+                        >
+                          <FaEye className="inline-block text-lg" />
+                        </button>
                       </div>
                     </div>
                   </div>
