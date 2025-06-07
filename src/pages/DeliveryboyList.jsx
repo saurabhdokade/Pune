@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useAuth } from "../components/AuthContext"; // <-- Import Auth context
 
 const PAGE_SIZE = 10;
 
@@ -18,11 +19,20 @@ const DriverList = () => {
   const [expandedDriver, setExpandedDriver] = useState({});
   const navigate = useNavigate();
 
+  // Get token
+  const { token } = useAuth();
+  const storedToken = token || localStorage.getItem("access_token");
+
   useEffect(() => {
     const fetchDrivers = async () => {
       setLoading(true);
       try {
-        const res = await axios.get("https://api.citycentermall.com/api/v1/super-admin/runners");
+        const res = await axios.get(
+          "https://api.citycentermall.com/api/v1/super-admin/runners",
+          {
+            headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {}
+          }
+        );
         let data = [];
         if (Array.isArray(res.data)) {
           data = res.data;
@@ -39,7 +49,7 @@ const DriverList = () => {
       setLoading(false);
     };
     fetchDrivers();
-  }, []);
+  }, [storedToken]);
 
   // Expand row and fetch driver info if needed
   const toggleExpand = async (id) => {
@@ -49,7 +59,12 @@ const DriverList = () => {
     }
     if (!expandedDriver[id]) {
       try {
-        const res = await axios.get(`https://api.citycentermall.com/api/v1/super-admin/runnerinfo/${id}`);
+        const res = await axios.get(
+          `https://api.citycentermall.com/api/v1/super-admin/runnerinfo/${id}`,
+          {
+            headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {}
+          }
+        );
         setExpandedDriver((prev) => ({
           ...prev,
           [id]: res.data?.data || res.data,
@@ -70,7 +85,12 @@ const DriverList = () => {
     if (!window.confirm("Are you sure you want to delete this driver?")) return;
     setDeletingId(id);
     try {
-      await axios.delete(`https://api.citycentermall.com/api/v1/super-admin/runnerinfo/${id}`);
+      await axios.delete(
+        `https://api.citycentermall.com/api/v1/super-admin/runnerinfo/${id}`,
+        {
+          headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {}
+        }
+      );
       setDrivers((prev) => prev.filter((d) => d._id.$oid !== id));
       toast.success("Driver deleted successfully!");
     } catch (error) {

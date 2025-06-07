@@ -4,6 +4,21 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 const baseurl = import.meta.env.REACT_APP_BASE_URL || "https://api.citycentermall.com";
 
+import { useAuth } from "../components/AuthContext";
+// Helper to decode JWT token
+function decodeJWT(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    if (!base64Url) return {};
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch {
+    return {};
+  }
+}
 export default function AddBranch() {
   const [formData, setFormData] = useState({
     name: "",
@@ -33,11 +48,40 @@ export default function AddBranch() {
   const [storeData, setStoreData] = useState(null);
   const [error, setError] = useState("");
 
+  const { user, token } = useAuth();
+  const [userName, setUserName] = useState("");
+  useEffect(() => {
+    if (user && user.name) {
+      setUserName(user.name);
+    } else {
+      const storedToken = token || localStorage.getItem("access_token");
+      if (storedToken) {
+        const payload = decodeJWT(storedToken);
+        setUserName(
+          payload.name ||
+          payload.fullName ||
+          payload.username ||
+          payload.mobile_no ||
+          "Admin"
+        );
+      } else {
+        setUserName("Admin");
+      }
+    }
+  }, [user, token]);
+
+
   useEffect(() => {
     const fetchCategories = async () => {
       setCategoriesLoading(true);
       try {
-        const res = await axios.get(`${baseurl}/api/v1/store-category`);
+        const storedToken = token || localStorage.getItem("access_token");
+
+        const res = await axios.get(`${baseurl}/api/v1/store-category`,
+           {
+            headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {}
+          }
+        );
         let cats = Array.isArray(res.data) ? res.data : res.data?.data || [];
         setCategories(cats);
       } catch {
@@ -46,7 +90,7 @@ export default function AddBranch() {
       setCategoriesLoading(false);
     };
     fetchCategories();
-  }, []);
+  }, [token]);
 
   // Get location
   const handleCurrentLocation = () => {

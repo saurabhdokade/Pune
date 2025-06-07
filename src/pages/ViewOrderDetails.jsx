@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../components/AuthContext"; // <-- Import Auth context
 
 const formatDate = (iso) => {
     if (!iso) return "N/A";
@@ -20,10 +21,16 @@ const OrderDetails = () => {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
+    // Get token from context or localStorage
+    const { token } = useAuth();
+    const storedToken = token || localStorage.getItem("access_token");
+
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://api.citycentermall.com/api/v1/super-admin/getorderdetails/${orderId}`)
+            .get(`https://api.citycentermall.com/api/v1/super-admin/getorderdetails/${orderId}`, {
+                headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {},
+            })
             .then((res) => {
                 // The API returns {order: {...}} or array, handle both
                 if (res.data?.order) {
@@ -36,7 +43,7 @@ const OrderDetails = () => {
             })
             .catch(() => setOrder(null))
             .finally(() => setLoading(false));
-    }, [orderId]);
+    }, [orderId, storedToken]);
 
     if (loading) {
         return (
@@ -71,6 +78,7 @@ const OrderDetails = () => {
     const vendor = order.vendor || {};
     const address = order.address || {};
     const item = order.order_item && order.order_item[0] ? order.order_item[0] : {};
+
 
     return (
         <div className="min-h-screen bg-[#faf9fb] py-8 px-2 md:px-8 font-sans p-6 mb-4 mt-14 ">

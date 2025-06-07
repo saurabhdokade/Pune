@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../components/AuthContext"; // <-- Import Auth context
 
 // Placeholder for Previous Orders (since API does not provide orders for customer)
 const previousOrders = [
@@ -32,12 +33,19 @@ export default function ViewCustomerInfo() {
   const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Get token from context or localStorage
+  const { token } = useAuth();
+  const storedToken = token || localStorage.getItem("access_token");
+
   useEffect(() => {
     async function fetchCustomer() {
       setLoading(true);
       try {
         const res = await axios.get(
-          `https://api.citycentermall.com/api/v1/super-admin/customers/${id}`
+          `https://api.citycentermall.com/api/v1/super-admin/customers/${id}`,
+          {
+            headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {},
+          }
         );
         setCustomer(res.data?.data || res.data);
       } catch (e) {
@@ -46,7 +54,7 @@ export default function ViewCustomerInfo() {
       setLoading(false);
     }
     if (id) fetchCustomer();
-  }, [id]);
+  }, [id, storedToken]);
 
   return (
     <div className="min-h-screen bg-[#faf9fb] py-8 px-2 md:px-8 font-sans p-6 mb-4 mt-14 ">

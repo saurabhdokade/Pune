@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
+import { useAuth } from "../components/AuthContext"; // <-- Import Auth context
 
 export default function EditCustomer() {
   const { id } = useParams();
@@ -15,12 +16,19 @@ export default function EditCustomer() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
+  // Get token from context or localStorage
+  const { token } = useAuth();
+  const storedToken = token || localStorage.getItem("access_token");
+
   useEffect(() => {
     async function fetchCustomer() {
       setLoading(true);
       try {
         const res = await axios.get(
-          `https://api.citycentermall.com/api/v1/super-admin/customers/${id}`
+          `https://api.citycentermall.com/api/v1/super-admin/customers/${id}`,
+          {
+            headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {},
+          }
         );
         const data = res.data?.data || res.data;
         setCustomer({
@@ -36,7 +44,7 @@ export default function EditCustomer() {
       setLoading(false);
     }
     if (id) fetchCustomer();
-  }, [id]);
+  }, [id, storedToken]);
 
   const handleChange = (e) => {
     setCustomer((prev) => ({
@@ -65,7 +73,12 @@ export default function EditCustomer() {
       const res = await axios.put(
         `https://api.citycentermall.com/api/v1/super-admin/customers/${id}`,
         data,
-        { headers: { "Content-Type": "application/json" } }
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: storedToken ? `Bearer ${storedToken}` : undefined,
+          },
+        }
       );
       console.log("Update response:", res);
 

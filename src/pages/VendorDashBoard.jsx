@@ -520,7 +520,7 @@ export default function VendorDashboard() {
         </div>
 
         {/* Recent Orders */}
-        <div className="bg-white rounded-xl shadow-md p-4 overflow-x-auto hidden md:block">
+        <div className="bg-white rounded-xl  p-4 font-sans p-6 mb-4 mt-14 shadow-md p-4 overflow-x-auto hidden md:block">
           <h3 className="text-lg font-semibold mb-4">Recent Orders</h3>
           <div className="overflow-auto">
             <table className="min-w-full text-sm text-left">

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useAuth } from "../components/AuthContext"; // <-- Import Auth context
 
 export default function EditBranch() {
   const { sellerId } = useParams();
@@ -33,12 +34,19 @@ export default function EditBranch() {
     store_logo: "",
   });
 
+  // Get token from context or localStorage
+  const { token } = useAuth();
+  const storedToken = token || localStorage.getItem("access_token");
+
   useEffect(() => {
     async function fetchBranch() {
       setLoading(true);
       try {
         const res = await axios.get(
-          `https://api.citycentermall.com/api/v1/super-admin/getsellerinfo/${sellerId}`
+          `https://api.citycentermall.com/api/v1/super-admin/getsellerinfo/${sellerId}`,
+          {
+            headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {}
+          }
         );
         const data = res.data?.data;
         setFormData({
@@ -72,7 +80,7 @@ export default function EditBranch() {
       setLoading(false);
     }
     if (sellerId) fetchBranch();
-  }, [sellerId]);
+  }, [sellerId, storedToken]);
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -130,6 +138,7 @@ export default function EditBranch() {
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            Authorization: storedToken ? `Bearer ${storedToken}` : undefined,
           },
         }
       );
@@ -147,6 +156,7 @@ export default function EditBranch() {
       <div className="text-center py-12 text-lg text-pink-500">Loading...</div>
     );
   }
+
 
   return (
     <div className="flex min-h-screen bg-white text-gray-700 font-sans pt-16">

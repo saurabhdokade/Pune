@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useAuth } from "../components/AuthContext"; // <-- import your auth context
 
 const PAGE_SIZE = 10;
 
@@ -19,6 +20,10 @@ const BranchList = () => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [sellerToDelete, setSellerToDelete] = useState(null);
 
+  // Get token from context or localStorage
+  const { token } = useAuth();
+  const storedToken = token || localStorage.getItem("access_token");
+
   // Fetch all sellers on mount
   useEffect(() => {
     const fetchSellers = async () => {
@@ -26,7 +31,10 @@ const BranchList = () => {
       try {
         const response = await axios.get(
           "https://api.citycentermall.com/api/v1/super-admin/getallseller",
-          { params: { page: "1", limit: "1000" } }
+          { 
+            params: { page: "1", limit: "1000" },
+            headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {}
+          }
         );
         let sellerData = [];
         if (Array.isArray(response.data)) {
@@ -47,7 +55,7 @@ const BranchList = () => {
       setLoading(false);
     };
     fetchSellers();
-  }, []);
+  }, [storedToken]); // depend on token so it updates if user logs in/out
 
   // Filtered and sorted data (by name, email, phone)
   const filtered = allSellers
@@ -84,7 +92,10 @@ const BranchList = () => {
     setDeleting(sellerToDelete);
     try {
       await axios.delete(
-        `https://api.citycentermall.com/api/v1/super-admin/delete-seller/${sellerToDelete}`
+        `https://api.citycentermall.com/api/v1/super-admin/delete-seller/${sellerToDelete}`,
+        {
+          headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {}
+        }
       );
       setAllSellers((prev) => prev.filter((c) => c.id !== sellerToDelete));
       toast.success("Seller deleted successfully!");

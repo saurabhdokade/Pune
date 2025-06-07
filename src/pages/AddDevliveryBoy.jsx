@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useAuth } from "../components/AuthContext"; // Ensure this provides the token
 
 export default function AddRunnerForm() {
   const [formData, setFormData] = useState({
@@ -30,6 +31,10 @@ export default function AddRunnerForm() {
   const [personalImage, setPersonalImage] = useState(null);
   const [policeVerification, setPoliceVerification] = useState(null);
 
+  // Get token from context or fallback to localStorage
+  const { token } = useAuth();
+  const storedToken = token || localStorage.getItem("access_token");
+
   // Handle input change for text fields
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -60,29 +65,13 @@ export default function AddRunnerForm() {
     const data = new FormData();
 
     // Append all text fields
-    data.append("firstName", formData.firstName);
-    data.append("lastName", formData.lastName);
-    data.append("email", formData.email);
-    data.append("address", formData.address);
-    data.append("city", formData.city);
-    data.append("isAvailable", formData.isAvailable); // boolean as string
-    data.append("current_location", JSON.stringify({
-      latitude: parseFloat(formData.current_location.latitude),
-      longitude: parseFloat(formData.current_location.longitude),
-    }));
-    data.append("state", formData.state);
-    data.append("pin_code", formData.pin_code);
-    data.append("contact_no", formData.contact_no);
-    data.append("vehicleType", formData.vehicleType);
-    data.append("vehicleNumber", formData.vehicleNumber);
-    data.append("drivingLicenseNo", formData.drivingLicenseNo);
-    data.append("aadharNumber", formData.aadharNumber);
-    data.append("account_no", formData.account_no);
-    data.append("account_holder_name", formData.account_holder_name);
-    data.append("bank_name", formData.bank_name);
-    data.append("IFSC_code", formData.IFSC_code);
-    data.append("branch_name", formData.branch_name);
-    data.append("UPI_id", formData.UPI_id);
+    Object.entries(formData).forEach(([key, value]) => {
+      if (key === "current_location") {
+        data.append(key, JSON.stringify(value));
+      } else {
+        data.append(key, value);
+      }
+    });
 
     // Append files if they exist
     if (licenseImage) data.append("licenseImage", licenseImage);
@@ -96,6 +85,8 @@ export default function AddRunnerForm() {
         {
           method: "POST",
           headers: {
+            Authorization: storedToken ? `Bearer ${storedToken}` : undefined,
+            // Do NOT set 'Content-Type' header for FormData! The browser will set it.
           },
           body: data,
         }
@@ -140,7 +131,6 @@ export default function AddRunnerForm() {
       alert("Error occurred while registering runner.");
     }
   };
-
   return (
     <div className="min-h-screen bg-[#F6F8FB] p-4 font-sans  p-6 mb-4 mt-16 ">
     <h2 className="text-center text-pink-600 font-semibold text-lg mb-8">Add Delivery Boy</h2>

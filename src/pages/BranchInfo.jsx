@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
+import { useAuth } from "../components/AuthContext"; // Import your auth context
 
 // Dummy delivery boys
 const deliveryBoys = [
@@ -31,6 +32,8 @@ const deliveryBoys = [
 export default function BranchInfo() {
   const { sellerId } = useParams();
   const navigate = useNavigate();
+  const { token } = useAuth(); // <-- Get token from context
+  const storedToken = token || localStorage.getItem("access_token"); // Fallback to localStorage
 
   const [sellerInfo, setSellerInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -46,7 +49,10 @@ export default function BranchInfo() {
       setProductError("");
       try {
         const res = await axios.get(
-          `https://api.citycentermall.com/api/v1/super-admin/getsellerinfo/${sellerId}`
+          `https://api.citycentermall.com/api/v1/super-admin/getsellerinfo/${sellerId}`,
+          {
+            headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {}
+          }
         );
         const info = res.data?.data || null;
         setSellerInfo(info);
@@ -86,7 +92,7 @@ export default function BranchInfo() {
       setProductError("Product not found.");
       setLoading(false);
     }
-  }, [sellerId]);
+  }, [sellerId, storedToken]);
 
   // Handler for vendor dashboard navigation
   const handleVendorDashboard = () => {

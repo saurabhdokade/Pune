@@ -5,7 +5,23 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useAuth } from "../components/AuthContext";
 
+
+// Helper to decode JWT token
+function decodeJWT(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    if (!base64Url) return {};
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch {
+    return {};
+  }
+}
 const branches = [
   { value: "supply", label: "Supply Wing" },
   { value: "sales", label: "Sales Wing" },
@@ -23,13 +39,40 @@ const CustomerList = () => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const { user, token } = useAuth();
+
+  const [userName, setUserName] = useState("");
+  useEffect(() => {
+    if (user && user.name) {
+      setUserName(user.name);
+    } else {
+      const storedToken = token || localStorage.getItem("access_token");
+      if (storedToken) {
+        const payload = decodeJWT(storedToken);
+        setUserName(
+          payload.name ||
+          payload.fullName ||
+          payload.username ||
+          payload.mobile_no ||
+          "Admin"
+        );
+      } else {
+        setUserName("Admin");
+      }
+    }
+  }, [user, token]);
+
 
   useEffect(() => {
     const fetchCustomers = async () => {
       setLoading(true);
       try {
+        const storedToken = token || localStorage.getItem("access_token");
         const response = await axios.get(
-          "https://api.citycentermall.com/api/v1/super-admin/customers"
+          "https://api.citycentermall.com/api/v1/super-admin/customers",
+          {
+            headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {}
+          }
         );
         let customerData = [];
         if (Array.isArray(response.data)) {
@@ -50,7 +93,7 @@ const CustomerList = () => {
       setLoading(false);
     };
     fetchCustomers();
-  }, []);
+  }, [token]);
 
   // Delete handler
   const handleDelete = async (id) => {
@@ -65,7 +108,7 @@ const CustomerList = () => {
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
-          "Failed to delete customer. Please try again."
+        "Failed to delete customer. Please try again."
       );
     }
     setDeletingId(null);

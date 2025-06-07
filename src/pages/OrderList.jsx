@@ -3,6 +3,7 @@ import { FaEye } from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../components/AuthContext"; // <-- Import Auth context
 
 const branches = [
   { value: "supply", label: "Supply Wing" },
@@ -51,10 +52,16 @@ const OrderList = () => {
 
   const navigate = useNavigate();
 
+  // Get token from context or localStorage
+  const { token } = useAuth();
+  const storedToken = token || localStorage.getItem("access_token");
+
   useEffect(() => {
     setLoading(true);
     axios
-      .get("https://api.citycentermall.com/api/v1/super-admin/getallorders")
+      .get("https://api.citycentermall.com/api/v1/super-admin/getallorders", {
+        headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {},
+      })
       .then((res) => {
         if (Array.isArray(res.data?.orders)) {
           setOrders(res.data.orders);
@@ -66,7 +73,7 @@ const OrderList = () => {
       })
       .catch(() => setOrders([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [storedToken]);
 
   // Flat/normalize orders for table
   const normalizedOrders = orders.map((order) => ({

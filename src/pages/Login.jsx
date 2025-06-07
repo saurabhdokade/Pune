@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaFacebookF, FaGoogle, FaApple } from "react-icons/fa";
 import Logo from "../components/Logo";
@@ -14,9 +14,12 @@ export default function Login() {
 
   const [step, setStep] = useState(1);
   const [mobile, setMobile] = useState("");
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState(["", "", "", ""]); // 4 columns for OTP
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState("");
+
+  // Create refs for OTP inputs
+  const otpRefs = [useRef(), useRef(), useRef(), useRef()];
 
   // Helper: decode JWT token (base64 decode, no validation)
   function decodeJWT(token) {
@@ -43,11 +46,16 @@ export default function Login() {
         toast.error(res.data.message || "Mobile number is not registered, please signup");
       } else {
         setStep(2);
-         if (res.data.otp) {
-        toast.success(`OTP sent successfully! Your OTP is ${res.data.otp}`);
-      } else {
-        toast.success("OTP sent successfully!");
-      }
+        setOtp(["", "", "", ""]);
+        if (res.data.otp) {
+          toast.success(`OTP sent successfully! Your OTP is ${res.data.otp}`);
+        } else {
+          toast.success("OTP sent successfully!");
+        }
+        // Focus on first OTP input
+        setTimeout(() => {
+          if (otpRefs[0].current) otpRefs[0].current.focus();
+        }, 100);
       }
     } catch (err) {
       const errorMsg =
@@ -66,11 +74,12 @@ export default function Login() {
     e.preventDefault();
     setApiError("");
     setLoading(true);
+    const otpString = otp.join("");
     try {
       const res = await axios.get(
         `https://api.citycentermall.com/api/v1/auth/verify-otp`,
         {
-          params: { mobile_no: mobile.replace(/[,\s]/g, ""), otp }
+          params: { mobile_no: mobile.replace(/[,\s]/g, ""), otp: otpString }
         }
       );
 
@@ -107,6 +116,48 @@ export default function Login() {
       toast.error(errorMsg);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // OTP Input Handlers
+  const handleOtpChange = (e, idx) => {
+    const value = e.target.value.replace(/[^0-9]/g, "");
+    if (!value) {
+      setOtp((prev) => {
+        const newOtp = [...prev];
+        newOtp[idx] = "";
+        return newOtp;
+      });
+      return;
+    }
+    if (value.length === 1) {
+      setOtp((prev) => {
+        const newOtp = [...prev];
+        newOtp[idx] = value;
+        return newOtp;
+      });
+      // Move focus to next input if available
+      if (idx < 3 && otpRefs[idx + 1].current) {
+        otpRefs[idx + 1].current.focus();
+      }
+    }
+  };
+
+  const handleOtpKeyDown = (e, idx) => {
+    if (e.key === "Backspace" && !otp[idx] && idx > 0) {
+      otpRefs[idx - 1].current.focus();
+    }
+  };
+
+  // OTP Paste Handler (for real-life UX)
+  const handleOtpPaste = (e) => {
+    const pasted = e.clipboardData.getData("Text").replace(/[^0-9]/g, "").slice(0, 4).split("");
+    if (pasted.length === 4) {
+      setOtp(pasted);
+      setTimeout(() => {
+        if (otpRefs[3].current) otpRefs[3].current.focus();
+      }, 50);
+      e.preventDefault();
     }
   };
 
@@ -169,28 +220,43 @@ export default function Login() {
               autoComplete="off"
             >
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="otp">
+                <label className="block text-sm font-medium mb-1 " htmlFor="otp">
                   OTP
                 </label>
-                <input
-                  className="w-full border border-[#bcbcbc] rounded-md px-3 py-2 font-medium focus:outline-none focus:border-[#264283] text-base"
-                  type="text"
-                  id="otp"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  autoComplete="one-time-code"
-                  required
-                  pattern="[0-9]{4,6}"
-                  placeholder="Enter OTP"
-                />
+                <div className="flex gap-4 justify-between w-full max-w-[280px] mx-auto">
+                  {[0, 1, 2, 3].map((idx) => (
+                    <input
+                      key={idx}
+                      ref={otpRefs[idx]}
+                      className={`otp-input flex-1 text-3xl md:text-4xl text-center border border-gray-400 rounded-lg p-2 md:p-3 focus:border-[#264283] focus:ring-2 focus:ring-[#26428322] transition bg-white outline-none tracking-widest font-bold`}
+                      style={{
+                        width: "48px",
+                        height: "56px",
+                        minWidth: "44px",
+                        maxWidth: "64px",
+                        letterSpacing: "2px",
+                      }}
+                      type="text"
+                      maxLength={1}
+                      value={otp[idx]}
+                      onChange={(e) => handleOtpChange(e, idx)}
+                      onKeyDown={(e) => handleOtpKeyDown(e, idx)}
+                      onPaste={handleOtpPaste}
+                      autoFocus={idx === 0}
+                      inputMode="numeric"
+                      pattern="[0-9]{1}"
+                      disabled={loading}
+                    />
+                  ))}
+                </div>
               </div>
               {apiError && (
                 <div className="text-red-500 text-sm">{apiError}</div>
               )}
               <button
                 type="submit"
-                className={`w-full bg-[#264283]  cursor-pointer text-white font-semibold text-lg rounded-md py-2.5 hover:bg-[#1f3662] transition ${loading ? "opacity-60 cursor-not-allowed" : ""}`}
-                disabled={loading}
+                className={`w-full bg-[#264283]  cursor-pointer text-white font-semibold text-lg rounded-md py-2.5 hover:bg-[#1f3662] transition ${loading || otp.some(v => v === "") ? "opacity-60 cursor-not-allowed" : ""}`}
+                disabled={loading || otp.some(v => v === "")}
               >
                 {loading ? "Verifying..." : "Verify OTP"}
               </button>
@@ -199,7 +265,7 @@ export default function Login() {
                 className="text-[#264283] cursor-pointer underline text-sm"
                 onClick={() => {
                   setStep(1);
-                  setOtp("");
+                  setOtp(["", "", "", ""]);
                   setApiError("");
                 }}
               >
@@ -207,35 +273,6 @@ export default function Login() {
               </button>
             </form>
           )}
-          {/* <div className="text-center text-sm mt-5">
-            <span className="text-[#222]">Don’t have an account? </span>
-            <a href="/signup" className="text-[#FF3B3B] font-medium hover:underline">Sign up</a>
-          </div> */}
-          {/* <div className="flex items-center my-3">
-            <div className="flex-1 h-px bg-[#e2e2e2]" />
-            <span className="mx-2 text-xs text-[#888]">Or login with</span>
-            <div className="flex-1 h-px bg-[#e2e2e2]" />
-          </div> */}
-          {/* <div className="grid grid-cols-3 gap-4">
-            <button
-              type="button"
-              className="flex items-center justify-center border border-[#757CFF] bg-white rounded-md py-3 text-xl hover:bg-[#f7f7fd] transition"
-            >
-              <FaFacebookF className="text-[#1877F3]" />
-            </button>
-            <button
-              type="button"
-              className="flex items-center justify-center border border-[#757CFF] bg-white rounded-md py-3 text-xl hover:bg-[#f7f7fd] transition"
-            >
-              <FaGoogle className="text-[#EA4335]" />
-            </button>
-            <button
-              type="button"
-              className="flex items-center justify-center border border-[#757CFF] bg-white rounded-md py-3 text-xl hover:bg-[#f7f7fd] transition"
-            >
-              <FaApple className="text-[#111]" />
-            </button>
-          </div> */}
         </div>
         {/* RIGHT: Illustration */}
         <div className="hidden md:flex w-1/2 justify-center items-center">
@@ -253,12 +290,6 @@ export default function Login() {
                   draggable={false}
                   style={{ marginTop: 0, marginBottom: 0 }}
                 />
-                {/* Carousel dots */}
-                {/* <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
-                  <span className="h-[6px] w-[18px] rounded-lg bg-[#757CFF]" />
-                  <span className="h-[6px] w-[6px] rounded-full bg-[#D1D5DB]" />
-                  <span className="h-[6px] w-[6px] rounded-full bg-[#D1D5DB]" />
-                </div> */}
               </div>
             </div>
           </div>

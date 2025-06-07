@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import axios from "axios";
+import { useAuth } from "../components/AuthContext"; // <-- Import your auth context
 
 export default function BranchProductDetailsPage() {
   const { sellerId } = useParams(); // expect route as /branchproduct/:sellerId
@@ -11,6 +12,10 @@ export default function BranchProductDetailsPage() {
   // For pagination display
   const [total, setTotal] = useState(0);
 
+  // Get token from context or localStorage
+  const { token } = useAuth();
+  const storedToken = token || localStorage.getItem("access_token");
+
   useEffect(() => {
     async function fetchProducts() {
       setLoading(true);
@@ -18,7 +23,10 @@ export default function BranchProductDetailsPage() {
       try {
         // Fetch seller info for products
         const res = await axios.get(
-          `https://api.citycentermall.com/api/v1/super-admin/getsellerinfo/${sellerId}`
+          `https://api.citycentermall.com/api/v1/super-admin/getsellerinfo/${sellerId}`,
+          {
+            headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {}
+          }
         );
         const storeProducts = res.data?.data?.store?.products || [];
         // Map products to table fields with fallbacks
@@ -53,7 +61,7 @@ export default function BranchProductDetailsPage() {
       setTotal(0);
       setLoading(false);
     }
-  }, [sellerId]);
+  }, [sellerId, storedToken]);
 
   return (
     <div className="min-h-screen bg-[#F6F8FB] p-4 font-sans p-6 mb-4 mt-16">

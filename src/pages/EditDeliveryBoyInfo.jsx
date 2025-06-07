@@ -4,6 +4,7 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useAuth } from "../components/AuthContext"; // <-- Import Auth context
 
 export default function EditDeliveryBoy() {
   const { id } = useParams();
@@ -21,12 +22,19 @@ export default function EditDeliveryBoy() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  // Get token from context or localStorage
+  const { token } = useAuth();
+  const storedToken = token || localStorage.getItem("access_token");
+
   useEffect(() => {
     async function fetchDeliveryBoy() {
       setLoading(true);
       try {
         const res = await axios.get(
-          `https://api.citycentermall.com/api/v1/super-admin/runnerinfo/${id}`
+          `https://api.citycentermall.com/api/v1/super-admin/runnerinfo/${id}`,
+          {
+            headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {},
+          }
         );
         const data = res.data?.data || res.data;
         let firstName = "", lastName = "";
@@ -55,7 +63,7 @@ export default function EditDeliveryBoy() {
       setLoading(false);
     }
     if (id) fetchDeliveryBoy();
-  }, [id]);
+  }, [id, storedToken]);
 
   const handleChange = (e) => {
     setDeliveryBoy((prev) => ({
@@ -109,7 +117,12 @@ export default function EditDeliveryBoy() {
       await axios.patch(
         `https://api.citycentermall.com/api/v1/super-admin/update/runner/${id}`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: storedToken ? `Bearer ${storedToken}` : undefined,
+          },
+        }
       );
       // Always show success, even if backend fails
       toast.success("Delivery boy updated successfully!");
