@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import {
     PieChart, Pie, Cell,
@@ -8,6 +8,22 @@ import {
 import { Star, RefreshCw } from "lucide-react";
 import pendingIcon from '../assets/b11069a4de6e255d90b4a00989a3ea8f73271f4c.png';
 import userIcon from '../assets/1be661da7ec47814f43f5782f152a0db7d07ce14.png';
+import { useAuth } from "../components/AuthContext";
+
+// Helper to decode JWT token
+function decodeJWT(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    if (!base64Url) return {};
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch {
+    return {};
+  }
+}
 
 // PieChart status colors
 const STATUS_COLORS = {
@@ -108,17 +124,48 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [pieData, setPieData] = useState([]);
+    const [orderStatusLoading, setOrderStatusLoading] = useState(false);
     const [lineData, setLineData] = useState([]);
     const [selectedYear, setSelectedYear] = useState("2025");
     const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
 
+    // Get the user from AuthContext, but fallback to token decode if not available
+    const { user, token } = useAuth();
+    const [userName, setUserName] = useState("");
+
+    // Get user name from context or decode from token
+    useEffect(() => {
+      if (user && user.name) {
+        setUserName(user.name);
+      } else {
+        const storedToken = token || localStorage.getItem("access_token");
+        if (storedToken) {
+          const payload = decodeJWT(storedToken);
+          setUserName(
+            payload.name ||
+            payload.fullName ||
+            payload.username ||
+            payload.mobile_no ||
+            "Admin"
+          );
+        } else {
+          setUserName("Admin");
+        }
+      }
+    }, [user, token]);
+
+    // Fetch all dashboard data EXCEPT order status (that's separated for refresh)
     useEffect(() => {
         async function fetchDashboard() {
             setLoading(true);
             setError(null);
             try {
+                const storedToken = token || localStorage.getItem("access_token");
                 const res = await axios.get(
-                    `https://api.citycentermall.com/api/v1/super-admin/dashboard?year=${selectedYear}`
+                    `https://api.citycentermall.com/api/v1/super-admin/dashboard?year=${selectedYear}`,
+                    {
+                        headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {}
+                    }
                 );
                 const data = res.data;
 
@@ -132,16 +179,6 @@ export default function Dashboard() {
                 ];
                 setStatCards(cards);
 
-                // Pie chart data with color applied
-                const pieChartData = [
-                    { name: "Delivered Orders", value: data.orderStatus.delivered, color: STATUS_COLORS.delivered },
-                    { name: "Pending Orders", value: data.orderStatus.pending, color: STATUS_COLORS.pending },
-                    { name: "Cancelled Orders", value: data.orderStatus.cancelled, color: STATUS_COLORS.cancelled },
-                    { name: "Processing Orders", value: data.orderStatus.processing, color: STATUS_COLORS.processing },
-                ];
-                setPieData(pieChartData);
-                setPendingOrdersCount(data.orderStatus.pending);
-
                 // Line chart data
                 const monthlyCounts = data.customerOverview.monthlyCounts;
                 const lineChartData = monthlyCounts.map((item, index) => ({
@@ -154,15 +191,56 @@ export default function Dashboard() {
                 }));
                 setLineData(lineChartData);
 
+                // Get order status data for pie chart
+                if (data.orderStatus) {
+                  setPieData([
+                    { name: "Delivered Orders", value: data.orderStatus.delivered, color: STATUS_COLORS.delivered },
+                    { name: "Pending Orders", value: data.orderStatus.pending, color: STATUS_COLORS.pending },
+                    { name: "Cancelled Orders", value: data.orderStatus.cancelled, color: STATUS_COLORS.cancelled },
+                    { name: "Processing Orders", value: data.orderStatus.processing, color: STATUS_COLORS.processing }
+                  ]);
+                  setPendingOrdersCount(data.orderStatus.pending);
+                } else {
+                  setPieData([]);
+                  setPendingOrdersCount(0);
+                }
+
                 setLoading(false);
             } catch (err) {
                 setError("Failed to load dashboard data.");
                 setLoading(false);
             }
         }
-
         fetchDashboard();
-    }, [selectedYear]);
+    }, [selectedYear, token]);
+
+    // Separate fetch for order status (for refresh)
+    const fetchOrderStatus = useCallback(async () => {
+      setOrderStatusLoading(true);
+      try {
+        const storedToken = token || localStorage.getItem("access_token");
+        // You may want to use a dedicated endpoint for just order status if your API supports it,
+        // for now, reusing the dashboard endpoint and only updating orderStatus data
+        const res = await axios.get(
+          `https://api.citycentermall.com/api/v1/super-admin/dashboard?year=${selectedYear}`,
+          {
+            headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {}
+          }
+        );
+        const orderStatus = res.data.orderStatus;
+        setPieData([
+          { name: "Delivered Orders", value: orderStatus.delivered, color: STATUS_COLORS.delivered },
+          { name: "Pending Orders", value: orderStatus.pending, color: STATUS_COLORS.pending },
+          { name: "Cancelled Orders", value: orderStatus.cancelled, color: STATUS_COLORS.cancelled },
+          { name: "Processing Orders", value: orderStatus.processing, color: STATUS_COLORS.processing }
+        ]);
+        setPendingOrdersCount(orderStatus.pending);
+      } catch {
+        // Optionally show toast/error
+      } finally {
+        setOrderStatusLoading(false);
+      }
+    }, [selectedYear, token]);
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>{error}</div>;
@@ -174,14 +252,15 @@ export default function Dashboard() {
                 {/* Top Bar */}
                 <div className="-mx-4 sm:-mx-1 bg-[#2F5383] px-4 sm:px-10 pt-5 pb-15 font-sans mb-3 mt-14 flex items-center justify-between" style={{ minHeight: 120 }}>
                     <div className="flex-1">
-                        <h2 className="text-2xl font-semibold text-white mb-1">Hello! John Doe</h2>
+                        <h2 className="text-2xl font-semibold text-white mb-1">
+                            Hello! {userName}
+                        </h2>
                         <p className="text-base font-normal text-white opacity-80">We are on a mission to help customer</p>
                     </div>
                 </div>
 
                 {/* Cards Row */}
                 <div className="relative -mt-10 z-10 px-2 sm:px-4 md:px-8 mb-2">
-                    {/* Mobile: vertical, fixed width; Desktop: grid */}
                     <div className="flex flex-col items-center gap-5 md:grid md:grid-cols-3 lg:grid-cols-5 md:gap-6">
                         {statCards.map((card, i) =>
                             <StatCard key={i} title={card.title} value={card.value} icon={card.icon} />
@@ -195,10 +274,24 @@ export default function Dashboard() {
                         <div className="bg-white rounded-xl shadow p-5">
                             <div className="flex items-center justify-between mb-2">
                                 <h4 className="font-semibold text-lg">Order Status</h4>
-                                <RefreshCw size={18} stroke="#23C16B" className="opacity-80" />
+                                <button
+                                  onClick={fetchOrderStatus}
+                                  disabled={orderStatusLoading}
+                                  className="focus:outline-none"
+                                  title="Refresh Order Status"
+                                >
+                                  <RefreshCw
+                                    size={18}
+                                    stroke="#23C16B"
+                                    className={`opacity-80  cursor-pointer transition-transform ${orderStatusLoading ? "animate-spin" : ""}`}
+                                  />
+                                </button>
                             </div>
                             <p className="text-xs text-gray-400 mb-2">Total Earnings of the Month</p>
                             <div className="relative h-[180px]">
+                                {orderStatusLoading ? (
+                                  <div className="text-center py-8">Refreshing...</div>
+                                ) : (
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
                                         <Pie
@@ -217,6 +310,7 @@ export default function Dashboard() {
                                         </Pie>
                                     </PieChart>
                                 </ResponsiveContainer>
+                                )}
                                 {/* Center Text */}
                                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
                                     <p className="text-xs font-medium text-gray-700">Ratio</p>

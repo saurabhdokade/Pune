@@ -168,7 +168,7 @@ const OrderDetails = () => {
             {/* </div> */}
             <div className="mt-8 flex justify-center">
                 <button
-                    className="px-4 py-2 bg-pink-500 text-white rounded"
+                    className="px-4 cursor-pointer py-2 bg-pink-500 text-white rounded"
                     onClick={() => navigate(-1)}
                 >
                     Back to Orders

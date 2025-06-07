@@ -86,7 +86,7 @@ export default function EditCustomer() {
       <Navbar />
       <div className="flex items-center mb-6">
         <button
-          className="mr-2 text-2xl text-gray-600 hover:text-pink-500"
+          className="mr-2 cursor-pointer text-2xl text-gray-600 hover:text-pink-500"
           onClick={() => navigate(-1)}
           aria-label="Back"
         >
@@ -152,7 +152,7 @@ export default function EditCustomer() {
             <button
               type="submit"
               disabled={saving}
-              className="bg-[#fa6788] hover:bg-pink-600 px-6 py-2 text-white rounded-md font-semibold transition disabled:opacity-50"
+              className="bg-[#fa6788] cursor-pointer hover:bg-pink-600 px-6 py-2 text-white rounded-md font-semibold transition disabled:opacity-50"
             >
               {saving ? "Saving..." : "Save"}
             </button>

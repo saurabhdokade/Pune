@@ -21,6 +21,7 @@ import EditBranch from './pages/EditBranch';
 import BranchList from './pages/BranchList';
 import OrderList from './pages/OrderList';
 import OrderDetails from './pages/ViewOrderDetails';
+import VendorDashboard from './pages/VendorDashBoard';
 
 // Protected route wrapper
 function ProtectedRoute({ children }) {
@@ -51,7 +52,7 @@ function AppContent() {
       {/* Mobile Toggle Button - always visible when not hidden */}
       {!hideSidebarAndNavbar && (
         <button
-          className={"fixed top-4 left-4 z-[1002] p-2 rounded-md  shadow md:hidden transition-opacity duration-300"}
+          className={"fixed top-4 left-4  z-[1002] p-2 rounded-md  shadow md:hidden transition-opacity duration-300"}
           onClick={() => setSidebarOpen(prev => !prev)}
           aria-label="Toggle sidebar"
         >
@@ -182,6 +183,11 @@ function AppContent() {
             <Route path='/vieworderdetails/:orderId' element={
               <ProtectedRoute>
                 <OrderDetails />
+              </ProtectedRoute>
+            } />
+              <Route path='/vendordashboard/:sellerId' element={
+              <ProtectedRoute>
+                <VendorDashboard />
               </ProtectedRoute>
             } />
             {/* Add more protected routes here */}

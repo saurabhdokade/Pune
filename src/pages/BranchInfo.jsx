@@ -57,9 +57,9 @@ export default function BranchInfo() {
             ? info.store.products.map((p, i) => ({
                 id: p.id || `P${i + 1}`,
                 code: p.id ? p.id.slice(-6).toUpperCase() : `P${i + 1}`,
-                brand: "Brand", // No brand in API
+                brand: "Brand",
                 name: p.name || "N/A",
-                size: "N/A", // No size in API
+                size: "N/A",
                 qty: p.product_stock ?? 0,
                 price: p.product_selling_price
                   ? `₹${p.product_selling_price}`
@@ -88,9 +88,23 @@ export default function BranchInfo() {
     }
   }, [sellerId]);
 
+  // Handler for vendor dashboard navigation
+  const handleVendorDashboard = () => {
+    // Replace '/vendordashboard' with your vendor dashboard route, and pass the sellerId in the URL
+    navigate(`/vendordashboard/${sellerId}`);
+  };
+
   return (
     <div className="min-h-screen bg-[#F6F8FB] p-4 font-sans  p-6 mb-4 mt-16">
       <Navbar />
+      <div className="flex justify-end mb-4">
+        <button
+          className="bg-[#EB627D] cursor-pointer hover:bg-[#d9506d] text-white font-medium rounded-md px-6 py-2 text-base"
+          onClick={handleVendorDashboard}
+        >
+         View More Info-(Dashboard)
+        </button>
+      </div>
       <h2 className="text-center text-2xl font-semibold text-[#F25C7A] mb-8 border-b-2 border-b-gray-100 pb-2 tracking-wide">
         <span className="font-bold" style={{ letterSpacing: 1 }}>
           View&nbsp; Branch Info

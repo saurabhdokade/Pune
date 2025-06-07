@@ -247,7 +247,7 @@ export default function EditBranch() {
               <div>
                 <button
                   type="submit"
-                  className="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-md text-base font-semibold transition"
+                  className="w-full cursor-pointer bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-md text-base font-semibold transition"
                 >
                   Update Branch
                 </button>

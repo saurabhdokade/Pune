@@ -176,9 +176,9 @@ const DriverList = () => {
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm text-gray-800 table-auto rounded-tl-xll">
               <thead>
-                <tr className="bg-[#EB627D] text-white text-left rounded-tl-xll">
-                  <th className="font-semibold py-3 px-4 rounded-tl-xll">Sr. No.</th>
-                  <th className="font-semibold py-3 px-6 cursor-pointer select-none">
+                <tr className="bg-[#EB627D]  text-white text-left rounded-tl-xll">
+                  <th className="font-semibold py-1 px-6 rounded-tl-xll">Sr. No.</th>
+                  <th className="font-semibold py-1 px-6 cursor-pointer select-none">
                     <div className="flex items-center gap-2">
                       <span>Full Name</span>
                       <button
@@ -190,10 +190,10 @@ const DriverList = () => {
                       </button>
                     </div>
                   </th>
-                  <th className="font-semibold py-3 px-6">Email</th>
-                  <th className="font-semibold py-3 px-6">Contact No.</th>
-                  <th className="font-semibold py-3 px-6">City</th>
-                  <th className="font-semibold py-3 px-6 rounded-tr-xll">Action</th>
+                  <th className="font-semibold py-1 px-6">Email</th>
+                  <th className="font-semibold py-1 px-6">Contact No.</th>
+                  <th className="font-semibold py-1 px-6">City</th>
+                  <th className="font-semibold py-1 px-6 rounded-tr-xll">Action</th>
                 </tr>
               </thead>
               <tbody>
