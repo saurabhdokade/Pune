@@ -17,15 +17,24 @@ const toRupees = (val) => (val == null ? "N/A" : `₹${val}`);
 
 // Utility to fetch brand name, never ID
 const getBrandName = (product) => {
-  // Prefer brand.brand_name if present
   if (product?.brand?.brand_name) return product.brand.brand_name;
-  // Sometimes directly as brand_name
   if (product?.brand_name) return product.brand_name;
-  // Sometimes as product_brand.brand_name
   if (product?.product_brand?.brand_name) return product.product_brand.brand_name;
-  // Sometimes as product_brand_id.brand_name
   if (product?.product_brand_id?.brand_name) return product.product_brand_id.brand_name;
-  // If nothing found, return N/A
+  return "N/A";
+};
+
+// Utility to get Product Sub Type (subCategory name)
+const getProductSubType = (item, product) => {
+  // Prefer product.subcategory.name if available
+  if (product?.subcategory?.name) return product.subcategory.name;
+  // Sometimes item.subcategory?.name
+  if (item?.subcategory?.name) return item.subcategory.name;
+  // Sometimes product.subcategory
+  if (typeof product?.subcategory === "string") return product.subcategory;
+  // Sometimes item.variant_name or product.variant_name
+  if (item?.variant_name) return item.variant_name;
+  if (product?.variant_name) return product.variant_name;
   return "N/A";
 };
 
@@ -35,7 +44,6 @@ const OrderDetails = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Get token from context or localStorage
   const { token } = useAuth();
   const storedToken = token || localStorage.getItem("access_token");
 
@@ -92,21 +100,15 @@ const OrderDetails = () => {
     );
   }
 
-  // User Data
   const user = order.user || {};
-  // Vendor Data
   const vendor = order.vendor || {};
-  // Address Data
   const address = order.address || {};
-  // First Order Item
   const item = order.order_item && order.order_item.length
     ? order.order_item[0]
     : {};
 
-  // Product Data
   const product = item.product || {};
 
-  // Use the utility for actual brand name always
   const productBrand = getBrandName(product);
   const productDescription =
     product.product_description ||
@@ -114,12 +116,9 @@ const OrderDetails = () => {
     product.product_bullets ||
     item.product_description ||
     "N/A";
-  const productSubType =
-    item.variant_name ||
-    product.variant_name ||
-    "N/A";
+  // Fix: get subcategory name as Product Sub Type
+  const productSubType = getProductSubType(item, product);
 
-  // Product Image
   const productImage =
     (product.product_images && product.product_images.length
       ? product.product_images[0]

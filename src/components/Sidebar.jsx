@@ -9,6 +9,7 @@ import {
   FaCreditCard,
   FaCog,
   FaSignOutAlt,
+  FaBox
 } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 import Logo from "./Logo"
@@ -80,6 +81,15 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <FaShoppingCart />
           <span>Orders</span>
         </li>
+        <li
+          className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer 
+    ${isActive("/products") ? "font-bold bg-white/20" : "hover:bg-white/10"}`}
+          onClick={() => navigate("/productList")}
+        >
+          <FaBox />
+          <span>Products</span>
+        </li>
+
 
         <li
           className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer 
@@ -114,7 +124,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         className="absolute bottom-4 left-4 flex items-center space-x-2 text-white hover:text-gray-300 cursor-pointer"
         onClick={() => {
           // Clear token and redirect to login
-          localStorage.removeItem("access_token"); 
+          localStorage.removeItem("access_token");
           navigate("/login");
         }}
       >

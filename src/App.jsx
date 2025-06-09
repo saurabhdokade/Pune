@@ -23,8 +23,12 @@ import OrderList from './pages/OrderList';
 import OrderDetails from './pages/ViewOrderDetails';
 import VendorDashboard from './pages/VendorDashBoard';
 import ViewProductDetails from './pages/ViewProductDetails';
+import ProductList from './pages/ProductList';
+import NotificationForm from './pages/AddNotification';
+import ProductDetails from './pages/ProductDetails';
+import EditProduct from './pages/EditProducts';
+import { FaBars } from 'react-icons/fa';
 
-// Protected route wrapper
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
   if (!isAuthenticated) {
@@ -35,9 +39,9 @@ function ProtectedRoute({ children }) {
 
 function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [navbarOpen, setNavbarOpen] = useState(true);
   const location = useLocation();
 
-  // Hide sidebar/navbar for auth routes
   const hideSidebarAndNavbar = [
     '/login',
     '/login/',
@@ -47,43 +51,38 @@ function AppContent() {
     '/',
   ].includes(location.pathname);
 
-  // Close sidebar automatically on route change (for mobile UX)
   useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);
 
+  const toggleSidebar = () => setSidebarOpen(prev => !prev);
+  const toggleNavbar = () => setNavbarOpen(prev => !prev);
+
   return (
     <div className="flex min-h-screen">
-      {/* Mobile Open Icon Button (→) - only visible if sidebar is closed and not hidden */}
       {!hideSidebarAndNavbar && !sidebarOpen && (
         <button
-          className="fixed top-1 left-2 z-[1002] p-2 rounded-md shadow md:hidden bg-white"
-          onClick={() => setSidebarOpen(true)}
+          className="md:hidden mr-4 text-white p-2 rounded-lg hover:bg-[#3b5a89] focus:outline-none fixed top-3 left-3 z-[1002] bg-[#2F5383]"
+          onClick={toggleSidebar}
           aria-label="Open sidebar"
+          type="button"
         >
-          {/* Right Arrow Icon (→) */}
-          <span style={{ fontSize: 24, color: '#7c3aed', fontWeight: 'bold' }}>{'→'}</span>
+          <FaBars size={22} />
         </button>
       )}
-
-      {/* Desktop Sidebar */}
       {!hideSidebarAndNavbar && (
         <div className="hidden md:flex fixed top-0 left-0 h-full w-64 bg-[#2F5383] text-white z-50">
           <Sidebar isOpen={true} toggleSidebar={setSidebarOpen} />
         </div>
       )}
-
-      {/* Mobile Sidebar & Overlay */}
       {!hideSidebarAndNavbar && (
         <div className="md:hidden">
-          {/* Overlay */}
           <div
             className={`fixed inset-0 z-[1000]  bg-opacity-50 transition-opacity duration-300 ${
               sidebarOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
             }`}
-            onClick={() => setSidebarOpen(false)}
+            onClick={toggleSidebar}
           />
-          {/* Mobile Sidebar */}
           <div
             className={`fixed top-0 left-0 h-full w-64 bg-[#2F5383] text-white z-[1001] overflow-hidden
               transform transition-transform duration-300 ${
@@ -91,14 +90,12 @@ function AppContent() {
               }`}
             onClick={e => e.stopPropagation()}
           >
-            {/* Close Icon (←) - show only if sidebar is open */}
             {sidebarOpen && (
               <button
                 className="absolute top-4 right-4 text-white bg-pink-500 rounded-full p-2 z-[1003] md:hidden"
-                onClick={() => setSidebarOpen(false)}
+                onClick={toggleSidebar}
                 aria-label="Close sidebar"
               >
-                {/* Left Arrow Icon (←) */}
                 <span style={{ fontSize: 24, fontWeight: 'bold' }}>{'←'}</span>
               </button>
             )}
@@ -106,19 +103,14 @@ function AppContent() {
           </div>
         </div>
       )}
-
-      {/* Main Content */}
       <div className="flex-1 flex flex-col ml-0 md:ml-64">
-        {!hideSidebarAndNavbar && (
-          <Navbar toggleSidebar={() => setSidebarOpen(prev => !prev)} />
+        {!hideSidebarAndNavbar && navbarOpen && (
+          <Navbar toggleSidebar={toggleSidebar} />
         )}
         <div className="flex-1 p-1 overflow-y-auto bg-gray min-h-screen">
           <Routes>
-            {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-
-            {/* Protected Routes */}
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
@@ -199,19 +191,31 @@ function AppContent() {
                 <OrderDetails />
               </ProtectedRoute>
             } />
-              <Route path='/vendordashboard/:sellerId' element={
+            <Route path='/vendordashboard/:sellerId' element={
               <ProtectedRoute>
                 <VendorDashboard />
               </ProtectedRoute>
             } />
-            <Route path='/productdetails' element={
+            <Route path='/productdetails/:id' element={
               <ProtectedRoute>
-                <ViewProductDetails />
+                <ProductDetails />
               </ProtectedRoute>
             } />
-            {/* Add more protected routes here */}
-            {/* Optional: Catch-all route */}
-            {/* <Route path="*" element={<Navigate to="/dashboard" />} /> */}
+            <Route path='/productList' element={
+              <ProtectedRoute>
+                <ProductList />
+              </ProtectedRoute>
+            } />
+            <Route path='/editproduct/:id' element={
+              <ProtectedRoute>
+                <EditProduct />
+              </ProtectedRoute>
+            } />
+            <Route path='/notifications' element={
+              <ProtectedRoute>
+                <NotificationForm/>
+              </ProtectedRoute>
+            } />
           </Routes>
         </div>
       </div>
