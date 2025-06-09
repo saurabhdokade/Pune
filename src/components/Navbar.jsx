@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { FaBell, FaMoon } from 'react-icons/fa';
-import { useAuth } from './AuthContext'; // Adjust the path as needed
+import { FaBell, FaMoon, FaBars } from 'react-icons/fa'; // Add FaBars for hamburger icon
+import { useAuth } from './AuthContext';
 
 // Helper: decode JWT token
 function decodeJWT(token) {
@@ -17,7 +17,7 @@ function decodeJWT(token) {
   }
 }
 
-const Navbar = () => {
+const Navbar = ({ toggleSidebar }) => {
   const { user, token } = useAuth();
 
   // Use user from context, or decode from token as fallback
@@ -40,6 +40,16 @@ const Navbar = () => {
         borderBottom: '3px solid #24446b',
       }}
     >
+      {/* Mobile Sidebar Toggle Button */}
+      <button
+        className="md:hidden mr-4 text-white p-2 rounded-lg hover:bg-[#3b5a89] focus:outline-none"
+        onClick={toggleSidebar}
+        aria-label="Open sidebar"
+        type="button"
+      >
+        <FaBars size={22} />
+      </button>
+
       {/* Search Bar */}
       <div className="flex items-center w-full max-w-md">
         <input

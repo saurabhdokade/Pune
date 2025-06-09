@@ -1,5 +1,5 @@
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
@@ -22,11 +22,11 @@ import BranchList from './pages/BranchList';
 import OrderList from './pages/OrderList';
 import OrderDetails from './pages/ViewOrderDetails';
 import VendorDashboard from './pages/VendorDashBoard';
+import ViewProductDetails from './pages/ViewProductDetails';
 
 // Protected route wrapper
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
-  // You may also want to check for token expiration here
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
@@ -47,26 +47,29 @@ function AppContent() {
     '/',
   ].includes(location.pathname);
 
+  // Close sidebar automatically on route change (for mobile UX)
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+
   return (
     <div className="flex min-h-screen">
-      {/* Mobile Toggle Button - always visible when not hidden */}
-      {!hideSidebarAndNavbar && (
+      {/* Mobile Open Icon Button (→) - only visible if sidebar is closed and not hidden */}
+      {!hideSidebarAndNavbar && !sidebarOpen && (
         <button
-          className={"fixed top-4 left-4  z-[1002] p-2 rounded-md  shadow md:hidden transition-opacity duration-300"}
-          onClick={() => setSidebarOpen(prev => !prev)}
-          aria-label="Toggle sidebar"
+          className="fixed top-1 left-2 z-[1002] p-2 rounded-md shadow md:hidden bg-white"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Open sidebar"
         >
-          {/* Hamburger Icon */}
-          <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
+          {/* Right Arrow Icon (→) */}
+          <span style={{ fontSize: 24, color: '#7c3aed', fontWeight: 'bold' }}>{'→'}</span>
         </button>
       )}
 
       {/* Desktop Sidebar */}
       {!hideSidebarAndNavbar && (
         <div className="hidden md:flex fixed top-0 left-0 h-full w-64 bg-[#2F5383] text-white z-50">
-          <Sidebar isOpen={sidebarOpen} toggleSidebar={setSidebarOpen} />
+          <Sidebar isOpen={true} toggleSidebar={setSidebarOpen} />
         </div>
       )}
 
@@ -88,6 +91,17 @@ function AppContent() {
               }`}
             onClick={e => e.stopPropagation()}
           >
+            {/* Close Icon (←) - show only if sidebar is open */}
+            {sidebarOpen && (
+              <button
+                className="absolute top-4 right-4 text-white bg-pink-500 rounded-full p-2 z-[1003] md:hidden"
+                onClick={() => setSidebarOpen(false)}
+                aria-label="Close sidebar"
+              >
+                {/* Left Arrow Icon (←) */}
+                <span style={{ fontSize: 24, fontWeight: 'bold' }}>{'←'}</span>
+              </button>
+            )}
             <Sidebar isOpen={sidebarOpen} toggleSidebar={setSidebarOpen} />
           </div>
         </div>
@@ -188,6 +202,11 @@ function AppContent() {
               <Route path='/vendordashboard/:sellerId' element={
               <ProtectedRoute>
                 <VendorDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path='/productdetails' element={
+              <ProtectedRoute>
+                <ViewProductDetails />
               </ProtectedRoute>
             } />
             {/* Add more protected routes here */}

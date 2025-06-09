@@ -15,6 +15,20 @@ const formatDate = (iso) => {
 
 const toRupees = (val) => (val == null ? "N/A" : `₹${val}`);
 
+// Utility to fetch brand name, never ID
+const getBrandName = (product) => {
+  // Prefer brand.brand_name if present
+  if (product?.brand?.brand_name) return product.brand.brand_name;
+  // Sometimes directly as brand_name
+  if (product?.brand_name) return product.brand_name;
+  // Sometimes as product_brand.brand_name
+  if (product?.product_brand?.brand_name) return product.product_brand.brand_name;
+  // Sometimes as product_brand_id.brand_name
+  if (product?.product_brand_id?.brand_name) return product.product_brand_id.brand_name;
+  // If nothing found, return N/A
+  return "N/A";
+};
+
 const OrderDetails = () => {
   const { orderId } = useParams();
   const [order, setOrder] = useState(null);
@@ -92,12 +106,8 @@ const OrderDetails = () => {
   // Product Data
   const product = item.product || {};
 
-  // Brand, Subtype, Description
-  const productBrand =
-    product.product_brand_id ||
-    product.brand ||
-    (product.product_brand ? product.product_brand.name : "") ||
-    "N/A";
+  // Use the utility for actual brand name always
+  const productBrand = getBrandName(product);
   const productDescription =
     product.product_description ||
     product.description ||
@@ -226,7 +236,6 @@ const OrderDetails = () => {
           <img
             src={productImage}
             alt="Product"
-            // className="w-full max-w-xs rounded shadow object-contain"
             style={{ background: "#f5f5f5", maxHeight: 260 }}
           />
         </div>
@@ -244,4 +253,3 @@ const OrderDetails = () => {
 };
 
 export default OrderDetails;
-

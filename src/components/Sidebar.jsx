@@ -11,7 +11,7 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
-
+import Logo from "./Logo"
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,7 +28,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       {/* Logo Section */}
       <div className="p-4 border-b border-white/20 flex items-center justify-start">
         <div className="font-bold text-sm text-white leading-tight">
-          <p className="text-xl font-bold">🎯</p>
+          <p className="text-xl font-bold"><Logo /></p>
           <p>CITY CENTER</p>
           <p>MALL</p>
         </div>

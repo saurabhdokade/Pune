@@ -318,7 +318,7 @@ export default function BranchInfo() {
                         <td className="px-4 py-3">
                           <button
                             onClick={() => handleProductDetails(row.id)}
-                            className="text-[#F25C7A] hover:text-pink-800 transition"
+                            className="text-[#F25C7A] cursor-pointer hover:text-pink-800 transition"
                             title="View Product Details"
                           >
                             <FaEye className="inline-block text-lg" />

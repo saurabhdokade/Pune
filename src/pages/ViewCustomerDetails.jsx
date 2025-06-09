@@ -50,7 +50,7 @@ export default function ViewCustomerInfo() {
         const item = order.order_item?.[0] || {};
         const product = item.product || {};
         return {
-          id: order.id,
+          orderId: order.id, // Added orderId field here
           date: formatDate(order.date_added),
           product: item.product_name || product.name || "-",
           quantity: item.quantity || "-",
@@ -129,6 +129,7 @@ export default function ViewCustomerInfo() {
                   <thead>
                     <tr className="bg-pink-200 text-pink-700">
                       <th className="py-2 px-2 md:px-4 font-semibold">SL.No</th>
+                      <th className="py-2 px-2 md:px-4 font-semibold">Order ID</th>
                       <th className="py-2 px-2 md:px-4 font-semibold">Date</th>
                       <th className="py-2 px-2 md:px-4 font-semibold">Product Image</th>
                       <th className="py-2 px-2 md:px-4 font-semibold">Product Name</th>
@@ -143,6 +144,7 @@ export default function ViewCustomerInfo() {
                     {previousOrders.map((order, idx) => (
                       <tr key={idx} className="even:bg-pink-50">
                         <td className="py-2 px-2 md:px-4 text-center">{idx + 1}</td>
+                        <td className="py-2 px-2 md:px-4 text-center">{order.orderId || "-"}</td>
                         <td className="py-2 px-2 md:px-4 text-center">{order.date}</td>
                         <td className="py-2 px-2 md:px-4 text-center">
                           {order.productImage ? (
@@ -162,7 +164,7 @@ export default function ViewCustomerInfo() {
                         <td className="py-2 px-2 md:px-4 text-center">{order.status}</td>
                         <td className="py-2 px-2 md:px-4 text-center">
                           <button
-                            onClick={() => navigate(`/vieworderdetails/${order.id}`)}
+                            onClick={() => navigate(`/vieworderdetails/${order.orderId}`)}
                             className="text-pink-600 cursor-pointer hover:text-pink-800 transition"
                             title="View Order Details"
                           >
