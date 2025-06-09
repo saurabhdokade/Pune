@@ -167,14 +167,19 @@ export default function Login() {
       <div className="w-full max-w-[1200px] mx-auto min-h-screen flex items-center px-2 py-8">
         {/* LEFT: Form */}
         <div className="w-full md:w-1/2 flex flex-col justify-center pl-2 md:pl-10">
-          {/* Logo */}
-          <div className="flex items-center mb-10">
-            <Logo size={38} />
-            <span className="ml-3 font-bold text-xl text-[#264283] leading-tight flex flex-col">
-              <span>CITY CENTER</span>
-              <span>MALL</span>
-            </span>
-          </div>
+          {/* Logo Section */}
+      <div className="pt-8 pb-4 px-0 border-b border-white/20 flex items-center justify-left ">
+        {/* Logo and Name side by side */}
+        <img
+          src="/images/Screenshot 2025-06-09 172029.png"
+          alt="City Center Mall Logo"
+          className="w-20 h-20 object-contain mr-1" // Increased size from w-12 h-12 to w-16 h-16
+        />
+        <div className="flex flex-col items-start justify-center">
+          <span className="text-[#2F5383] font-bold text-lg leading-tight">CITY CENTER</span>
+          <span className="text-[#2F5383] font-bold text-lg leading-tight">MALL</span>
+        </div>
+      </div>
           <h2 className="text-4xl font-semibold text-[#222] mb-3">Login</h2>
           <p className="text-[#5b5b5b] text-base mb-7">
             Login to access your admin&nbsp;<span className="font-medium">account</span>
