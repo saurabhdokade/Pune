@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useAuth } from "../components/AuthContext"; // Ensure this provides  token
+import { useAuth } from "../components/AuthContext"; // Ensure this provides the token
 
 export default function AddRunnerForm() {
   const [formData, setFormData] = useState({
