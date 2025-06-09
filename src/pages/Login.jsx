@@ -164,7 +164,7 @@ export default function Login() {
   return (
     <div className="min-h-screen w-full bg-[#FAFAFA] flex flex-col justify-center items-center">
       <ToastContainer position="top-center" autoClose={3000} />
-      <div className="w-full max-w-[1200px] mx-auto min-h-screen flex items-center px-2 py-8">
+      <div className="w-full max-w-[1200px] mx-auto min-h-screen flex items-center  px-2 py-8">
         {/* LEFT: Form */}
         <div className="w-full md:w-1/2 flex flex-col justify-center pl-2 md:pl-10">
           {/* Logo Section */}
@@ -173,9 +173,9 @@ export default function Login() {
         <img
           src="/images/Screenshot 2025-06-09 172029.png"
           alt="City Center Mall Logo"
-          className="w-20 h-20 object-contain mr-1" // Increased size from w-12 h-12 to w-16 h-16
+          className="w-25 h-25 object-contain mr-1" // Increased size from w-12 h-12 to w-16 h-16
         />
-        <div className="flex flex-col items-start justify-center">
+        <div className="flex flex-col items-start justify-left">
           <span className="text-[#2F5383] font-bold text-lg leading-tight">CITY CENTER</span>
           <span className="text-[#2F5383] font-bold text-lg leading-tight">MALL</span>
         </div>
