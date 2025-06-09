@@ -12,7 +12,7 @@ import {
   FaBox
 } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
-import Logo from "./Logo"
+
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -27,11 +27,16 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                   md:w-64 md:relative md:translate-x-0 overflow-hidden`}
     >
       {/* Logo Section */}
-      <div className="p-4 border-b border-white/20 flex items-center justify-start">
-        <div className="font-bold text-sm text-white leading-tight">
-          <p className="text-xl font-bold"><Logo /></p>
-          <p>CITY CENTER</p>
-          <p>MALL</p>
+      <div className="pt-8 pb-4 px-0 border-b border-white/20 flex items-center justify-left ">
+        {/* Logo and Name side by side */}
+        <img
+          src="/images/Screenshot 2025-06-09 142328.png"
+          alt="City Center Mall Logo"
+          className="w-20 h-20 object-contain mr-1" // Increased size from w-12 h-12 to w-16 h-16
+        />
+        <div className="flex flex-col items-start justify-center">
+          <span className="text-white font-bold text-lg leading-tight">CITY CENTER</span>
+          <span className="text-white font-bold text-lg leading-tight">MALL</span>
         </div>
       </div>
 
@@ -66,7 +71,19 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
         <li
           className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer 
-            ${isActive("/deliveryboys") ? "font-bold bg-white/20" : "hover:bg-white/10"}`}
+            ${isActive("/productlist") ? "font-bold bg-white/20" : "hover:bg-white/10"}`}
+          onClick={() => navigate("/productlist")}
+        >
+          <FaBox />
+          <span>Products</span>
+        </li>
+
+        <li
+          className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer 
+            ${isActive("/deliveryboys")
+              ? "font-bold bg-white/20"
+              : "hover:bg-white/10 "
+            }`}
           onClick={() => navigate("/deliveryboys")}
         >
           <FaMotorcycle />
@@ -81,15 +98,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <FaShoppingCart />
           <span>Orders</span>
         </li>
-        <li
-          className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer 
-    ${isActive("/products") ? "font-bold bg-white/20" : "hover:bg-white/10"}`}
-          onClick={() => navigate("/productList")}
-        >
-          <FaBox />
-          <span>Products</span>
-        </li>
-
 
         <li
           className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer 
