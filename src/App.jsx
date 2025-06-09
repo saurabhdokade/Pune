@@ -28,6 +28,10 @@ import NotificationForm from './pages/AddNotification';
 import ProductDetails from './pages/ProductDetails';
 import EditProduct from './pages/EditProducts';
 import { FaBars } from 'react-icons/fa';
+import SettingsPage from './pages/TermPrivacyAbout';
+import EditTerms from './pages/EditTerm';
+import EditPrivacy from './pages/EditPrivacy';
+import EditAboutUs from './pages/EditAbout';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
@@ -214,6 +218,26 @@ function AppContent() {
             <Route path='/notifications' element={
               <ProtectedRoute>
                 <NotificationForm/>
+              </ProtectedRoute>
+            } />
+            <Route path='/settings' element={
+              <ProtectedRoute>
+                <SettingsPage/>
+              </ProtectedRoute>
+            } />
+             <Route path='/editterms' element={
+              <ProtectedRoute>
+                <EditTerms/>
+              </ProtectedRoute>
+            } />
+             <Route path='/editprivacy' element={
+              // <ProtectedRoute>
+                <EditPrivacy/>
+              // </ProtectedRoute>
+            } />
+            <Route path='/editabout' element={
+              <ProtectedRoute>
+                <EditAboutUs/>
               </ProtectedRoute>
             } />
           </Routes>
